@@ -57,6 +57,7 @@ Engine_Shadow : CroneEngine {
 			    local = LeakDC.ar(local);
 			    local = ((local + in) * 1.25).softclip;
 			    local = LPF.ar(local,Lag.kr(lpf,1));
+				// TODO: add impulse to destroy signal if feedback > 1.4
 			    LocalOut.ar(local*Lag.kr(feedback,1));
 				snd = Balance2.ar(local[0] * 0.2,local[1]*0.2,SinOsc.kr(
 					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)

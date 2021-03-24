@@ -5,7 +5,8 @@ shadow=include("shadow/lib/shadow")
 local MusicUtil=require "musicutil"
 local Formatters=require 'formatters'
 local feedback_temp=0
-local current_vol=0
+local vol_current=0
+local vol_target=0
 
 function init()
   skeys=shadow:new()
@@ -37,6 +38,8 @@ end
 
 function redraw_clock() -- our grid redraw clock
   while true do -- while it's running...
+    -- have this clock move target volume to current volume
+    vol_current = vol_current+sign(vol_target-vol_current)/10
     clock.sleep(1/30) -- refresh
     redraw()
   end
@@ -46,7 +49,7 @@ function redraw()
   screen.clear()
   local rfilter = util.linlin(0,18000,2,144,params:get("lpf"))
   local rfeedback = util.linlin(0.9,1.5,0,16,params:get("feedback"))
-  local rvolume = util.linlin(0,1,0,rfilter+16,current_vol)
+  local rvolume = util.linlin(0,1,0,rfilter+16,vol_current)
   local rlow = rfeedback
   local rhigh = rfeedback+rvolume
   for i=rhigh,rlow,-1 do
@@ -67,9 +70,20 @@ function rerun()
   norns.script.load(norns.state.script)
 end
 
+function sign(x)
+  if x>0 then
+    return 1
+  elseif x<0 then
+    return-1
+  else
+    return 0
+  end
+end
+
+
 --
 -- osc
 -- 
 function osc_in(path, args, from)
-  current_vol = (util.linlin(0,0.15,0,1,args[2])+current_vol)/2
+  vol_target = util.linlin(0,0.15,0,1,args[2])
 end

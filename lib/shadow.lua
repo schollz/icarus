@@ -18,6 +18,7 @@ function Shadow:new(args)
   local args=args==nil and {} or args
   l.debug = args.debug
 
+  -- TODO: move midi stuff to main script
   -- get list of devices
   local mididevice = {}
   local mididevice_list = {"none"}
