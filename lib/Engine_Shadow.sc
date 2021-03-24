@@ -36,6 +36,7 @@ Engine_Shadow : CroneEngine {
 				);
 
 				// dreamcrusher
+				// TODO: try using SawTooth for PWM
 				in = Splay.ar(Pulse.ar(Lag.kr(hz+SinOsc.kr(LFNoise0.kr(1)),portamento),
 						LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
 				));
