@@ -18,60 +18,15 @@ function Shadow:new(args)
   local args=args==nil and {} or args
   l.debug = args.debug
 
-  -- TODO: move midi stuff to main script
-  -- get list of devices
-  local mididevice = {}
-  local mididevice_list = {"none"}
-  for _,dev in pairs(midi.devices) do
-    if dev.port~=nil then
-      local name=string.lower(dev.name)
-      table.insert(mididevice_list,name)
-      print("adding "..name.." to port "..dev.port)
-      mididevice[name]={
-        name=name,
-        port=dev.port,
-        midi=midi.connect(dev.port),
-        active=false,
-      }
-      mididevice[name].midi.event=function(data)
-        if mididevice[name].active == false then 
-          do return end
-        end
-        if (data[1]==144 or data[1]==128) then
-          tab.print(data)
-          if data[1]==144 and data[3] > 0 then
-            -- TODO make this separate
-            l:on(data[2])
-            -- skeys:on({name=available_instruments[instrument_current].id,midi=data[2],velocity=data[3]})
-          elseif data[1]==128 or data[3] == 0 then
-            l:off(data[2])
-            -- skeys:off({name=available_instruments[instrument_current].id,midi=data[2]})
-          end
-        end
-      end
-    end
-  end
-  tab.print(mididevice_list)
-
   l.voice={} -- list of voices and how hold they are
   for i=1,VOICE_NUM do
-    l.voice[i]={age=current_time(),active={name="",midi=0}}
+    l.voice[i]={age=current_time(),note=0}
   end
 
   local debounce_delaytime=0
 
   params:add_group("SHADOW",11)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
-  params:add{type="option",id="midi",name="midi in",options=mididevice_list,default=1}
-  params:set_action("midi",function(v)
-    if v==1 then 
-      do return end 
-    end
-    for name,_ in pairs(mididevice) do
-      mididevice[name].active=false
-    end
-    mididevice[mididevice_list[v]].active=true
-  end)
   params:add {
     type='control',
     id="amp",
@@ -154,6 +109,14 @@ function Shadow:new(args)
   controlspec=controlspec.new(0,3,'lin',0,0.1,'s',0.1/3)}
   params:set_action("portamento",function(v)
     engine.portamento(v)
+  end)
+  params:add {
+    type='control',
+    id="destruction",
+    name="destruction",
+  controlspec=controlspec.new(0,3,'lin',0,0.0,'s',0.1/3)}
+  params:set_action("destruction",function(v)
+    engine.destruction(v)
   end)
   params:bang()
 
