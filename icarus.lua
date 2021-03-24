@@ -1,7 +1,7 @@
--- shadow v0.0.1
+-- icarus v0.0.1
 
-engine.name="Shadow"
-shadow=include("shadow/lib/shadow")
+engine.name="Icarus"
+icarus=include("icarus/lib/icarus")
 local MusicUtil=require "musicutil"
 local Formatters=require 'formatters'
 local feedback_temp=0
@@ -9,7 +9,7 @@ local vol_current=0
 local vol_target=0
 
 function init()
-  skeys=shadow:new()
+  skeys=icarus:new()
 
   setup_midi()
   -- osc input

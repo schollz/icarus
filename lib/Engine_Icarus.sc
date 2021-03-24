@@ -1,10 +1,10 @@
-// Engine_Shadow
+// Engine_Icarus
 
 // Inherit methods from CroneEngine
-Engine_Shadow : CroneEngine {
+Engine_Icarus : CroneEngine {
 
 	// MxSamples specific
-	var shadowPlayer;
+	var icarusPlayer;
 	var osfun;
 	// MxSamples ^
 
@@ -15,7 +15,7 @@ Engine_Shadow : CroneEngine {
 	alloc {
 
 		(0..5).do({arg i; 
-			SynthDef("shadowsynth"++i,{ 
+			SynthDef("icarussynth"++i,{ 
 				arg amp=0.5, hz=220, pan=0, envgate=0,
 				attack=0.015,decay=1,release=2,sustain=0.9,
 				lpf=20000,portamento=0.1,destruction=0,
@@ -95,95 +95,95 @@ Engine_Shadow : CroneEngine {
 	    		},{})
 	    	},'/tr', context.server.addr);
 
-		shadowPlayer = Array.fill(4,{arg i;
-			Synth("shadowsynth"++i, target:context.xg);
+		icarusPlayer = Array.fill(4,{arg i;
+			Synth("icarussynth"++i, target:context.xg);
 		});
 
-		this.addCommand("shadowon","if", { arg msg;
+		this.addCommand("icaruson","if", { arg msg;
 			// lua is sending 1-index
-			shadowPlayer[msg[1]-1].set(
+			icarusPlayer[msg[1]-1].set(
 				\envgate,1,
 				\hz,msg[2],
 			);
 		});
 
-		this.addCommand("shadowoff","i", { arg msg;
+		this.addCommand("icarusoff","i", { arg msg;
 			// lua is sending 1-index
-			shadowPlayer[msg[1]-1].set(
+			icarusPlayer[msg[1]-1].set(
 				\envgate,0,
 			);
 		});
 
 		this.addCommand("amp","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\amp,msg[1]);
+				icarusPlayer[i].set(\amp,msg[1]);
 			});
 		});
 
 		this.addCommand("pan","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\pan,msg[1]);
+				icarusPlayer[i].set(\pan,msg[1]);
 			});
 		});
 
 		this.addCommand("attack","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\attack,msg[1]);
+				icarusPlayer[i].set(\attack,msg[1]);
 			});
 		});
 
 		this.addCommand("release","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\release,msg[1]);
+				icarusPlayer[i].set(\release,msg[1]);
 			});
 		});
 
 		this.addCommand("decay","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\decay,msg[1]);
+				icarusPlayer[i].set(\decay,msg[1]);
 			});
 		});
 
 		this.addCommand("sustain","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\sustain,msg[1]);
+				icarusPlayer[i].set(\sustain,msg[1]);
 			});
 		});
 
 		this.addCommand("delaytime","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\delaytime,msg[1]);
+				icarusPlayer[i].set(\delaytime,msg[1]);
 			});
 		});
 
 		this.addCommand("feedback","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\feedback,msg[1]);
+				icarusPlayer[i].set(\feedback,msg[1]);
 			});
 		});
 
 		this.addCommand("destruction","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\destruction,msg[1]);
+				icarusPlayer[i].set(\destruction,msg[1]);
 			});
 		});
 
 		this.addCommand("lpf","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\lpf,msg[1]);
+				icarusPlayer[i].set(\lpf,msg[1]);
 			});
 		});
 
 		this.addCommand("portamento","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\portamento,msg[1]);
+				icarusPlayer[i].set(\portamento,msg[1]);
 			});
 		});
 
 	}
 
 	free {
-		(0..5).do({arg i; shadowPlayer[i].free});
+		(0..5).do({arg i; icarusPlayer[i].free});
 		osfun.free;
 	}
 }

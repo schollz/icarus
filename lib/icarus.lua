@@ -4,7 +4,7 @@
 local MusicUtil=require "musicutil"
 local Formatters=require 'formatters'
 
-local Shadow={}
+local Icarus={}
 
 local VOICE_NUM=4
 
@@ -13,8 +13,8 @@ local function current_time()
 end
 
 
-function Shadow:new(args)
-  local l=setmetatable({},{__index=Shadow})
+function Icarus:new(args)
+  local l=setmetatable({},{__index=Icarus})
   local args=args==nil and {} or args
   l.debug=args.debug
 
@@ -137,28 +137,28 @@ function Shadow:new(args)
   return l
 end
 
-function Shadow:reset()
+function Icarus:reset()
   for i,_ in ipairs(self.voice) do
     self.voice[i]={age=current_time(),note=0} -- reset voices
   end
 end
 
-function Shadow:on(note,velocity)
+function Icarus:on(note,velocity)
   voice=self:get_voice(note)
-  engine.shadowon(
+  engine.icaruson(
     voice,
     MusicUtil.note_num_to_freq(note)
   )
   return voice
 end
 
-function Shadow:off(note)
+function Icarus:off(note)
   -- find the voice being used for this one
   for i,voice in ipairs(self.voice) do
     if voice.note==note then
       -- this is the one!
       if self.debug then
-        print("shadow: turning off "..note)
+        print("icarus: turning off "..note)
       end
       -- TODO: make this behavior optional
       if self.voice[i].feedback~=nil and self.voice[i].feedback>1 then
@@ -166,13 +166,13 @@ function Shadow:off(note)
       end
       self.voice[i].age=current_time()
       self.voice[i].note=0
-      engine.shadowoff(i)
+      engine.icarusoff(i)
       do return end
     end
   end
 end
 
-function Shadow:get_voice(note)
+function Icarus:get_voice(note)
   local oldest={i=0,age=0}
 
   -- gets voice if its already a note
@@ -210,7 +210,7 @@ function Shadow:get_voice(note)
   -- turn off voice
   -- oldest.i=1
   print("using voice "..oldest.i)
-  engine.shadowoff(oldest.i)
+  engine.icarusoff(oldest.i)
   self.voice[oldest.i].age=current_time()
   self.voice[oldest.i].note=note
   if params:get("feedback")>1 then
@@ -221,4 +221,4 @@ function Shadow:get_voice(note)
 end
 
 
-return Shadow
+return Icarus
