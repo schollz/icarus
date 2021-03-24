@@ -16,7 +16,7 @@ end
 function Shadow:new(args)
   local l=setmetatable({},{__index=Shadow})
   local args=args==nil and {} or args
-  l.debug = args.debug
+  l.debug=args.debug
 
   l.voice={} -- list of voices and how hold they are
   for i=1,VOICE_NUM do
@@ -124,16 +124,16 @@ function Shadow:new(args)
     local debounce_delaytime_0=0
     while true do -- while it's running...
       clock.sleep(0.1) -- refresh
-      if debounce_delaytime > 0 then 
-          if debounce_delaytime_0==debounce_delaytime then
-            print("setting delaytime "..debounce_delaytime)
-            engine.delaytime(debounce_delaytime)
-            debounce_delaytime=0
-          end
-          debounce_delaytime_0=debounce_delaytime
+      if debounce_delaytime>0 then
+        if debounce_delaytime_0==debounce_delaytime then
+          print("setting delaytime "..debounce_delaytime)
+          engine.delaytime(debounce_delaytime)
+          debounce_delaytime=0
+        end
+        debounce_delaytime_0=debounce_delaytime
       end
     end
-  end) 
+  end)
   return l
 end
 
@@ -147,7 +147,7 @@ function Shadow:on(note,velocity)
   voice=self:get_voice(note)
   engine.shadowon(
     voice,
-    MusicUtil.note_num_to_freq(note)  
+    MusicUtil.note_num_to_freq(note)
   )
   return voice
 end
@@ -157,11 +157,11 @@ function Shadow:off(note)
   for i,voice in ipairs(self.voice) do
     if voice.note==note then
       -- this is the one!
-      if self.debug then 
+      if self.debug then
         print("shadow: turning off "..note)
       end
       -- TODO: make this behavior optional
-      if self.voice[i].feedback~= nil and self.voice[i].feedback > 1 then
+      if self.voice[i].feedback~=nil and self.voice[i].feedback>1 then
         params:set("feedback",self.voice[i].feedback)
       end
       self.voice[i].age=current_time()
@@ -201,8 +201,8 @@ function Shadow:get_voice(note)
         end
       end
       -- still found none, just take the first
-      if oldest.i == 0 then 
-        oldest.i = 1
+      if oldest.i==0 then
+        oldest.i=1
       end
     end
   end
@@ -213,7 +213,7 @@ function Shadow:get_voice(note)
   engine.shadowoff(oldest.i)
   self.voice[oldest.i].age=current_time()
   self.voice[oldest.i].note=note
-  if params:get("feedback") > 1 then
+  if params:get("feedback")>1 then
     self.voice[oldest.i].feedback=params:get("feedback")
   end
   params:set("feedback",0.9)
