@@ -37,6 +37,14 @@ function Icarus:new(args)
   end)
   params:add {
     type='control',
+    id="sub",
+    name="sub",
+  controlspec=controlspec.new(0,10,'lin',0,1.0,'amp')}
+  params:set_action("sub",function(v)
+    engine.sub(v)
+  end)
+  params:add {
+    type='control',
     id="pan",
     name="pan",
   controlspec=controlspec.new(-1,1,'lin',0,0)}

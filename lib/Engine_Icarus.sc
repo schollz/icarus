@@ -19,10 +19,10 @@ Engine_Icarus : CroneEngine {
 				arg amp=0.5, hz=220, pan=0, envgate=0,
 				attack=0.015,decay=1,release=2,sustain=0.9,
 				lpf=20000,portamento=0.1,destruction=0,
-				feedback=0.5,delaytime=0.25;
+				feedback=0.5,delaytime=0.25, sublevel=0;
 
 				// vars
-				var ender,snd,local,in,ampcheck;
+				var ender,snd,local,in,ampcheck,centstonextnote;
 
 				// envelope stuff
 				ender = EnvGen.ar(
@@ -36,10 +36,18 @@ Engine_Icarus : CroneEngine {
 				);
 
 				// dreamcrusher
-				// TODO: try using SawTooth for PWM
-				in = Splay.ar(Pulse.ar(Lag.kr(hz+SinOsc.kr(LFNoise0.kr(1)),portamento),
-						LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
+				// try using SawTooth for PWM
+				centstonextnote=((hz.cpsmidi+1).midicps-hz);
+				in = Splay.ar(Pulse.ar(Lag.kr(hz+SinOsc.kr(LFNoise0.kr(1)).range(-centstonextnote,centstonextnote),portamento),
+						LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
+						// LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
 				));
+				// add suboscillator
+				centstonextnote=(((hz/2).cpsmidi+1).midicps-(hz/2));
+				in = in + (sublevel*Splay.ar(Pulse.ar(Lag.kr(hz/2++SinOsc.kr(LFNoise0.kr(1)).range(-centstonextnote,centstonextnote),portamento),
+						LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
+						// LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
+				)));
 				in = Balance2.ar(in[0] ,in[1],SinOsc.kr(
 					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
 				)*0.1);
@@ -177,6 +185,12 @@ Engine_Icarus : CroneEngine {
 		this.addCommand("portamento","f", { arg msg;
 			(0..5).do({arg i; 
 				icarusPlayer[i].set(\portamento,msg[1]);
+			});
+		});
+
+		this.addCommand("sub","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\sublevel,msg[1]);
 			});
 		});
 
