@@ -200,6 +200,7 @@ function Shadow:off(note)
       if self.debug then 
         print("shadow: turning off "..note)
       end
+      -- TODO: make this behavior optional
       if self.voice[i].feedback~= nil and self.voice[i].feedback > 1 then
         params:set("feedback",self.voice[i].feedback)
       end
