@@ -120,10 +120,6 @@ function Shadow:new(args)
   end)
   params:bang()
 
-  if #mididevice_list > 1 then
-    params:set("midi",2)
-  end
-
   clock.run(function()
     local debounce_delaytime_0=0
     while true do -- while it's running...

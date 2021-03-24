@@ -63,6 +63,10 @@ function setup_midi()
     mididevice[mididevice_list[v]].active=true
   end)
 
+
+  if #mididevice_list > 1 then
+    params:set("midi",2)
+  end
 end
 
 
