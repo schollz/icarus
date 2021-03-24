@@ -1,11 +1,10 @@
-// Engine_MxSamples
+// Engine_Shadow
 
 // Inherit methods from CroneEngine
-Engine_MxSamples : CroneEngine {
+Engine_Shadow : CroneEngine {
 
 	// MxSamples specific
-	var sampleBuffMxSamples;
-	var samplerPlayerMxSamples;
+	var shadowPlayer;
 	// MxSamples ^
 
 	*new { arg context, doneCallback;
@@ -14,21 +13,42 @@ Engine_MxSamples : CroneEngine {
 
 	alloc {
 
-		sampleBuffMxSamples = Array.fill(200, { arg i; 
-			Buffer.new(context.server);
-		});
-
-		(0..15).do({arg i; 
-			SynthDef("player"++i,{ 
-				arg bufnum, amp, t_trig=0,envgate=1,
+		(0..5).do({arg i; 
+			SynthDef("shadowsynth"++i,{ 
+				arg amp=0.5, hz=220, pan=0, envgate=1,
 				attack=0.015,decay=1,release=2,sustain=0.9,
-				sampleStart=0,sampleEnd=1,rate=1,pan=0,
-				lpf=20000,hpf=10,
-				secondsPerBeat=1,delayBeats=8,delayFeedback=1,delaySend=0;
+				lpf=20000,
+				feedback=0.5,delaytime=0.25;
 
 				// vars
-				var ender,snd;
+				var ender,snd,local,in,ampcheck;
 
+				// dreamcrusher
+				in = Splay.ar(Pulse.ar(Lag.ar(hz*
+						LinLin.kr(SinOsc.kr(LFNoise0.kr(1)/2),-1,1,0.99,1.01),1),
+						LinLin.kr(SinOsc.kr(LFNoise0.kr(1)),-1,1,0.45,0.55)
+				));
+				in = Balance2.ar(in[0] ,in[1],SinOsc.kr(
+					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
+				)*0.1);
+			    ampcheck = Amplitude.kr(Mix.ar(in));
+			    in = in * (ampcheck > 0.02); // noise gate
+			    local = LocalIn.ar(2);
+			    local = OnePole.ar(local, 0.4);
+			    local = OnePole.ar(local, -0.08);
+			    local = Rotate2.ar(local[0], local[1],0.2);
+				local = DelayN.ar(local, 0.5,
+					VarLag.kr(delaytime,0.1,warp:\sine)
+				);
+			    local = LeakDC.ar(local);
+			    local = ((local + in) * 1.25).softclip;
+			    local = LPF.ar(local,lpf);
+			    LocalOut.ar(local*feedback)
+				snd = Balance2.ar(local[0] * 0.2,local[1]*0.2,SinOsc.kr(
+					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
+				)*0.1);
+
+				// envelope stuff
 				ender = EnvGen.ar(
 					Env.new(
 						curve: 'cubed',
@@ -39,66 +59,41 @@ Engine_MxSamples : CroneEngine {
 					gate: envgate,
 				);
 				
-				snd = PlayBuf.ar(2, bufnum,
-					rate:BufRateScale.kr(bufnum)*rate,
-				 	startPos: ((sampleEnd*(rate<0))*BufFrames.kr(bufnum))+(sampleStart/1000*48000),
-				 	trigger:t_trig,
-				);
-		        snd = LPF.ar(snd,lpf);
-		        snd = HPF.ar(snd,hpf);
+
+				// manual pan
 				snd = Mix.ar([
 					Pan2.ar(snd[0],-1+(2*pan),amp),
 					Pan2.ar(snd[1],1+(2*pan),amp),
 				]);
-				snd = snd * amp * ender;
-		        snd = snd*0.5 +
-		        	((delaySend>0)*CombN.ar(
-		        		snd,
-						1,secondsPerBeat*delayBeats,secondsPerBeat*delayBeats*LinLin.kr(delayFeedback,0,1,2,128),0.5*delaySend // delayFeedback should vary between 2 and 128
-					)); 
+				snd = snd * ender;
 				Out.ar(0,snd)
 			}).add;	
 		});
 
-		samplerPlayerMxSamples = Array.fill(14,{arg i;
-			Synth("player"++i, target:context.xg);
+		shadowPlayer = Array.fill(4,{arg i;
+			Synth("shadowsynth"++i, target:context.xg);
 		});
 
-		this.addCommand("mxsamplesrelease","", { arg msg;
-			(0..199).do({arg i; sampleBuffMxSamples[i].free});
-		});
-		this.addCommand("mxsamplesload","is", { arg msg;
-			// lua is sending 0-index
-			sampleBuffMxSamples[msg[1]].free;
-			sampleBuffMxSamples[msg[1]] = Buffer.read(context.server,msg[2]);
-		});
-
-		this.addCommand("mxsampleson","iiffffffffffffff", { arg msg;
+		this.addCommand("shadowon","iffffffffff", { arg msg;
 			// lua is sending 1-index
-			samplerPlayerMxSamples[msg[1]-1].set(
-				\t_trig,1,
+			shadowPlayer[msg[1]-1].set(
 				\envgate,1,
-				\bufnum,msg[2],
-				\rate,msg[3],
-				\amp,msg[4],
-				\pan,msg[5],
-				\attack,msg[6],
-				\decay,msg[7],
-				\sustain,msg[8],
-				\release,msg[9],
-				\lpf,msg[10],
-				\hpf,msg[11],
-				\secondsPerBeat,msg[12],
-				\delayBeats,msg[13],
-				\delayFeedback,msg[14],
-				\delaySend,msg[15],
-				\sampleStart,msg[16],
+				\hz,msg[2],
+				\amp,msg[3],
+				\pan,msg[4],
+				\attack,msg[5],
+				\decay,msg[6],
+				\sustain,msg[7],
+				\release,msg[8],
+				\lpf,msg[9],
+				\feedback,msg[10],
+				\delaytime,msg[11],
 			);
 		});
 
-		this.addCommand("mxsamplesoff","i", { arg msg;
+		this.addCommand("shadowoff","i", { arg msg;
 			// lua is sending 1-index
-			samplerPlayerMxSamples[msg[1]-1].set(
+			shadowPlayer[msg[1]-1].set(
 				\envgate,0,
 			);
 		});
@@ -106,7 +101,6 @@ Engine_MxSamples : CroneEngine {
 	}
 
 	free {
-		(0..199).do({arg i; sampleBuffMxSamples[i].free});
-		(0..15).do({arg i; samplerPlayerMxSamples[i].free});
+		(0..5).do({arg i; shadowPlayer[i].free});
 	}
 }
