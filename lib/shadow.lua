@@ -57,6 +57,8 @@ function Shadow:new(args)
     l.voice[i]={age=current_time(),active={name="",midi=0}}
   end
 
+  local debounce_delaytime=0
+
   params:add_group("SHADOW",11)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
   params:add{type="option",id="midi",name="midi in",options=mididevice_list,default=1}
@@ -89,7 +91,7 @@ function Shadow:new(args)
     type='control',
     id="attack",
     name="attack",
-  controlspec=controlspec.new(0,10,'lin',0,0,'s')}
+  controlspec=controlspec.new(0,10,'lin',0,0.5,'s')}
   params:set_action("attack",function(v)
     engine.attack(v)
   end)
@@ -139,9 +141,10 @@ function Shadow:new(args)
     type='control',
     id="delaytime",
     name="delay time",
-  controlspec=controlspec.new(0.1,0.5,'lin',0,0.25,'s',0.01/0.5)}
+  controlspec=controlspec.new(15,30,'lin',0,25,'x100 s',0.01/15)}
   params:set_action("delaytime",function(v)
-    engine.delaytime(v)
+    engine.delaytime(v/100)
+    -- debounce_delaytime=v
   end)
   params:add {
     type='control',
@@ -153,8 +156,24 @@ function Shadow:new(args)
   end)
   params:bang()
 
-  params:set("midi",2)
+  if #mididevice_list > 1 then
+    params:set("midi",2)
+  end
 
+  clock.run(function()
+    local debounce_delaytime_0=0
+    while true do -- while it's running...
+      clock.sleep(0.1) -- refresh
+      if debounce_delaytime > 0 then 
+          if debounce_delaytime_0==debounce_delaytime then
+            print("setting delaytime "..debounce_delaytime)
+            engine.delaytime(debounce_delaytime)
+            debounce_delaytime=0
+          end
+          debounce_delaytime_0=debounce_delaytime
+      end
+    end
+  end) 
   return l
 end
 
@@ -221,6 +240,7 @@ function Shadow:get_voice(note)
   end
 
   -- turn off voice
+  oldest.i=1
   engine.shadowoff(oldest.i)
   self.voice[oldest.i].age=current_time()
   self.voice[oldest.i].note=note

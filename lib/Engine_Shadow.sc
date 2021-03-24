@@ -5,6 +5,7 @@ Engine_Shadow : CroneEngine {
 
 	// MxSamples specific
 	var shadowPlayer;
+	var osfun;
 	// MxSamples ^
 
 	*new { arg context, doneCallback;
@@ -23,30 +24,6 @@ Engine_Shadow : CroneEngine {
 				// vars
 				var ender,snd,local,in,ampcheck;
 
-				// dreamcrusher
-				in = Splay.ar(Pulse.ar(Lag.kr(hz+SinOsc.kr(LFNoise0.kr(1)),portamento),
-						LinLin.kr(SinOsc.kr(LFNoise0.kr(1)),-1,1,0.45,0.55)
-				));
-				in = Balance2.ar(in[0] ,in[1],SinOsc.kr(
-					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
-				)*0.1);
-			    ampcheck = Amplitude.kr(Mix.ar(in));
-			    in = in * (ampcheck > 0.02); // noise gate
-			    local = LocalIn.ar(2);
-			    local = OnePole.ar(local, 0.4);
-			    local = OnePole.ar(local, -0.08);
-			    local = Rotate2.ar(local[0], local[1],0.2);
-				local = DelayN.ar(local, 0.5,
-					VarLag.kr(delaytime,0.1,warp:\sine)
-				);
-			    local = LeakDC.ar(local);
-			    local = ((local + in) * 1.25).softclip;
-			    local = LPF.ar(local,lpf);
-			    LocalOut.ar(local*feedback);
-				snd = Balance2.ar(local[0] * 0.2,local[1]*0.2,SinOsc.kr(
-					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
-				)*0.1);
-
 				// envelope stuff
 				ender = EnvGen.ar(
 					Env.new(
@@ -57,6 +34,33 @@ Engine_Shadow : CroneEngine {
 					),
 					gate: envgate,
 				);
+
+				// dreamcrusher
+				in = Splay.ar(Pulse.ar(Lag.kr(hz+SinOsc.kr(LFNoise0.kr(1)),portamento),
+						LinLin.kr(SinOsc.kr(LFNoise0.kr(1)),-1,1,0.45,0.55)
+				));
+				in = Balance2.ar(in[0] ,in[1],SinOsc.kr(
+					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
+				)*0.1);
+				in = in * ender;
+			    ampcheck = Amplitude.kr(Mix.ar(in));
+			    in = in * (ampcheck > 0.02); // noise gate
+			    local = LocalIn.ar(2);
+			    local = OnePole.ar(local, 0.4);
+			    local = OnePole.ar(local, -0.08);
+			    local = Rotate2.ar(local[0], local[1],0.2);
+				local = DelayN.ar(local, 0.5,
+					// VarLag.kr(LinLin.kr(LFNoise0.kr(0.1),-1,1,0.15,0.3),1/0.1,warp:\sine)
+					// VarLag.kr(delaytime,0.1,warp:\sine)
+					Lag.kr(delaytime,0.05)
+				);
+			    local = LeakDC.ar(local);
+			    local = ((local + in) * 1.25).softclip;
+			    local = LPF.ar(local,lpf);
+			    LocalOut.ar(local*feedback);
+				snd = Balance2.ar(local[0] * 0.2,local[1]*0.2,SinOsc.kr(
+					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
+				)*0.1);
 				
 
 				// manual pan
@@ -64,10 +68,19 @@ Engine_Shadow : CroneEngine {
 					Pan2.ar(snd[0],-1+(2*pan),amp),
 					Pan2.ar(snd[1],1+(2*pan),amp),
 				]);
-				snd = snd * ender;
+			    SendTrig.kr(Dust.kr(10.0),0,Amplitude.kr(snd[0]+snd[1],2,2));
 				Out.ar(0,snd)
 			}).add;	
 		});
+
+	    osfun = OSCFunc(
+	    	{ 
+	    		arg msg, time; 
+	    		if (msg[3]>0, {
+		    		[time, msg].postln;
+					NetAddr("127.0.0.1", 10111).sendMsg("ampcheck",time,msg[3]);   //sendMsg works out the correct OSC message for you
+	    		},{})
+	    	},'/tr', context.server.addr);
 
 		shadowPlayer = Array.fill(4,{arg i;
 			Synth("shadowsynth"++i, target:context.xg);
@@ -126,7 +139,7 @@ Engine_Shadow : CroneEngine {
 
 		this.addCommand("delaytime","f", { arg msg;
 			(0..5).do({arg i; 
-				shadowPlayer[i].set(\decaytime,msg[1]);
+				shadowPlayer[i].set(\delaytime,msg[1]);
 			});
 		});
 
@@ -152,5 +165,6 @@ Engine_Shadow : CroneEngine {
 
 	free {
 		(0..5).do({arg i; shadowPlayer[i].free});
+		osfun.free;
 	}
 }

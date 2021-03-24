@@ -7,7 +7,8 @@ local Formatters=require 'formatters'
 
 function init()
   skeys=shadow:new()
-
+  -- osc input 
+  osc.event = osc_in
   clock.run(redraw_clock) 
 end
 
@@ -35,4 +36,14 @@ end
 
 function rerun()
   norns.script.load(norns.state.script)
+end
+
+--
+-- osc
+-- 
+function osc_in(path, args, from)
+  -- print("------")
+  -- print(path)
+  -- tab.print(args)
+  -- print(from)
 end
