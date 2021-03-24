@@ -37,7 +37,7 @@ Engine_Shadow : CroneEngine {
 
 				// dreamcrusher
 				in = Splay.ar(Pulse.ar(Lag.kr(hz+SinOsc.kr(LFNoise0.kr(1)),portamento),
-						LinLin.kr(SinOsc.kr(LFNoise0.kr(1)),-1,1,0.45,0.55)
+						LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
 				));
 				in = Balance2.ar(in[0] ,in[1],SinOsc.kr(
 					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
@@ -52,12 +52,12 @@ Engine_Shadow : CroneEngine {
 				local = DelayN.ar(local, 0.5,
 					// VarLag.kr(LinLin.kr(LFNoise0.kr(0.1),-1,1,0.15,0.3),1/0.1,warp:\sine)
 					// VarLag.kr(delaytime,0.1,warp:\sine)
-					Lag.kr(delaytime,0.05)
+					Lag.kr(delaytime,0.05)+rrand(-0.05,0.05)
 				);
 			    local = LeakDC.ar(local);
 			    local = ((local + in) * 1.25).softclip;
-			    local = LPF.ar(local,lpf);
-			    LocalOut.ar(local*feedback);
+			    local = LPF.ar(local,Lag.kr(lpf,1));
+			    LocalOut.ar(local*Lag.kr(feedback,1));
 				snd = Balance2.ar(local[0] * 0.2,local[1]*0.2,SinOsc.kr(
 					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
 				)*0.1);
@@ -68,7 +68,7 @@ Engine_Shadow : CroneEngine {
 					Pan2.ar(snd[0],-1+(2*pan),amp),
 					Pan2.ar(snd[1],1+(2*pan),amp),
 				]);
-			    SendTrig.kr(Dust.kr(10.0),0,Amplitude.kr(snd[0]+snd[1],2,2));
+			    SendTrig.kr(Dust.kr(10.0),0,Amplitude.kr(snd[0]+snd[1],3,3));
 				Out.ar(0,snd)
 			}).add;	
 		});
@@ -77,7 +77,7 @@ Engine_Shadow : CroneEngine {
 	    	{ 
 	    		arg msg, time; 
 	    		if (msg[3]>0, {
-		    		[time, msg].postln;
+		    		// [time, msg].postln;
 					NetAddr("127.0.0.1", 10111).sendMsg("ampcheck",time,msg[3]);   //sendMsg works out the correct OSC message for you
 	    		},{})
 	    	},'/tr', context.server.addr);

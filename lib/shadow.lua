@@ -200,6 +200,9 @@ function Shadow:off(note)
       if self.debug then 
         print("shadow: turning off "..note)
       end
+      if self.voice[i].feedback~= nil and self.voice[i].feedback > 1 then
+        params:set("feedback",self.voice[i].feedback)
+      end
       self.voice[i].age=current_time()
       self.voice[i].note=0
       engine.shadowoff(i)
@@ -209,26 +212,30 @@ function Shadow:off(note)
 end
 
 function Shadow:get_voice(note)
-  local oldest={i=0,age=current_time()}
+  local oldest={i=0,age=0}
 
   -- gets voice if its already a note
   for i,voice in ipairs(self.voice) do
     if voice.note==note then
+      print("voice note "..i..note)
       oldest={i=i,age=voice.age}
     end
   end
 
-  -- gets voice based on the oldest that is not being used
+  -- gets voice based on the newest that is not being used
   if oldest.i==0 then
     for i,voice in ipairs(self.voice) do
-      if voice.age<oldest.age and voice.note==0 then
+      print(i,voice.age,oldest.age,voice.note)
+      if voice.age>oldest.age and (voice.note==0 or voice.note==nil) then
+        print("newest voice "..i)
         oldest={i=i,age=voice.age}
       end
     end
     -- found none - now just take the oldest
     if oldest.i==0 then
+      print("just taking newest")
       for i,voice in ipairs(self.voice) do
-        if voice.age<oldest.age then
+        if voice.age>oldest.age then
           oldest={i=i,age=voice.age}
         end
       end
@@ -240,10 +247,15 @@ function Shadow:get_voice(note)
   end
 
   -- turn off voice
-  oldest.i=1
+  -- oldest.i=1
+  print("using voice "..oldest.i)
   engine.shadowoff(oldest.i)
   self.voice[oldest.i].age=current_time()
   self.voice[oldest.i].note=note
+  if params:get("feedback") > 1 then
+    self.voice[oldest.i].feedback=params:get("feedback")
+  end
+  params:set("feedback",0.9)
   return oldest.i
 end
 
