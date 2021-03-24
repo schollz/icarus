@@ -18,7 +18,7 @@ Engine_Shadow : CroneEngine {
 			SynthDef("shadowsynth"++i,{ 
 				arg amp=0.5, hz=220, pan=0, envgate=0,
 				attack=0.015,decay=1,release=2,sustain=0.9,
-				lpf=20000,portamento=0.1,
+				lpf=20000,portamento=0.1,destruction=0,
 				feedback=0.5,delaytime=0.25;
 
 				// vars
@@ -57,7 +57,18 @@ Engine_Shadow : CroneEngine {
 			    local = LeakDC.ar(local);
 			    local = ((local + in) * 1.25).softclip;
 			    local = LPF.ar(local,Lag.kr(lpf,1));
-				// TODO: add impulse to destroy signal if feedback > 1.4
+				// add destruction
+				local = ((local*((1-EnvGen.kr(
+				        Env(
+				            levels: [0, 1,0], 
+				            times: [0.1,0.1],
+							curve:\sine,
+				        ),
+				        gate: Dust.kr(destruction)
+				))))+local)/2;
+
+
+
 			    LocalOut.ar(local*Lag.kr(feedback,1));
 				snd = Balance2.ar(local[0] * 0.2,local[1]*0.2,SinOsc.kr(
 					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
@@ -147,6 +158,12 @@ Engine_Shadow : CroneEngine {
 		this.addCommand("feedback","f", { arg msg;
 			(0..5).do({arg i; 
 				shadowPlayer[i].set(\feedback,msg[1]);
+			});
+		});
+
+		this.addCommand("destruction","f", { arg msg;
+			(0..5).do({arg i; 
+				shadowPlayer[i].set(\destruction,msg[1]);
 			});
 		});
 
