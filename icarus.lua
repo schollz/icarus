@@ -37,14 +37,11 @@ function setup_midi()
           do return end
         end
         if (data[1]==144 or data[1]==128) then
-          tab.print(data)
+          -- tab.print(data)
           if data[1]==144 and data[3]>0 then
-            -- TODO make this separate
             skeys:on(data[2])
-            -- skeys:on({name=available_instruments[instrument_current].id,midi=data[2],velocity=data[3]})
           elseif data[1]==128 or data[3]==0 then
             skeys:off(data[2])
-            -- skeys:off({name=available_instruments[instrument_current].id,midi=data[2]})
           end
         end
       end
@@ -75,6 +72,12 @@ function enc(k,d)
     params:delta("lpf",-1*sign(d))
   elseif k==2 then 
     params:delta("delaytime",-d)
+    if params:get("delaytime")<25 then
+      params:delta("tremelo",d)
+      params:set("pressdisablesfeedback",2)
+    else
+      params:set("pressdisablesfeedback",1)
+    end
   elseif k==3 then
     params:delta("feedback",d)
   end
@@ -96,7 +99,7 @@ function redraw_clock() -- our grid redraw clock
   while true do -- while it's running...
     -- have this clock move target volume to current volume
     vol_current=vol_current+sign(vol_target-vol_current)/200
-    print(vol_current,vol_target)
+    -- print(vol_current,vol_target)
     clock.sleep(1/30) -- refresh
     redraw()
   end
@@ -106,7 +109,7 @@ function redraw()
   screen.clear()
 
   -- make the sun curve in the sky based on delay time
-  local delay_range={23,26}
+  local delay_range={23,27}
   local rdelay=util.linlin(delay_range[1],delay_range[2],90,270,params:get("delaytime"))
   local center={64,32}
   local rpos={center[1]+40*math.sin(math.rad(rdelay)),center[2]+40*math.cos(math.rad(rdelay))}
@@ -125,7 +128,7 @@ function redraw()
   screen.circle(rpos[1],rpos[2]+10,rfeedback)
   screen.fill()
   -- the ocean
-  local rfilter=util.linlin(0,18000,0,64,params:get("lpf"))
+  local rfilter=util.linlin(0,18000,32,64,params:get("lpf"))
   screen.level(0)
   screen.rect(0,rfilter,129,65)
   screen.fill()

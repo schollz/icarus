@@ -18,7 +18,7 @@ Engine_Icarus : CroneEngine {
 			SynthDef("icarussynth"++i,{ 
 				arg amp=0.5, hz=220, pan=0, envgate=0,
 				attack=0.015,decay=1,release=2,sustain=0.9,
-				lpf=20000,portamento=0.1,destruction=0,
+				lpf=20000,portamento=0.1,tremelo=0,
 				feedback=0.5,delaytime=0.25, sublevel=0;
 
 				// vars
@@ -63,21 +63,19 @@ Engine_Icarus : CroneEngine {
 			    local = OnePole.ar(local, -0.08);
 			    local = Rotate2.ar(local[0], local[1],0.2);
 				local = DelayN.ar(local, 0.5,
-					// VarLag.kr(LinLin.kr(LFNoise0.kr(0.1),-1,1,0.15,0.3),1/0.1,warp:\sine)
-					// VarLag.kr(delaytime,0.1,warp:\sine)
 					Lag.kr(delaytime,0.05)+rrand(-0.05,0.05)
 				);
 			    local = LeakDC.ar(local);
 			    local = ((local + in) * 1.25).softclip;
-			    local = LPF.ar(local,Lag.kr(lpf,1));
-				// add destruction
+			    local = MoogLadder.ar(local,Lag.kr(lpf,1));
+				// add tremelo thing
 				local = ((local*((1-EnvGen.kr(
 				        Env(
 				            levels: [0, 1,0], 
 				            times: [0.1,0.1],
 							curve:\sine,
 				        ),
-				        gate: Dust.kr(destruction)
+				        gate: Dust.kr(tremelo)
 				))))+local)/2;
 
 
@@ -174,9 +172,9 @@ Engine_Icarus : CroneEngine {
 			});
 		});
 
-		this.addCommand("destruction","f", { arg msg;
+		this.addCommand("tremelo","f", { arg msg;
 			(0..5).do({arg i; 
-				icarusPlayer[i].set(\destruction,msg[1]);
+				icarusPlayer[i].set(\tremelo,msg[1]);
 			});
 		});
 

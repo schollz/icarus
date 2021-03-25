@@ -25,7 +25,7 @@ function Icarus:new(args)
 
   local debounce_delaytime=0
 
-  params:add_group("SHADOW",11)
+  params:add_group("ICARUS",13)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
   params:add {
     type='control',
@@ -97,7 +97,7 @@ function Icarus:new(args)
     type='control',
     id="feedback",
     name="feedback",
-  controlspec=controlspec.new(0.5,1.5,'lin',0,1.0,'',0.01/1)}
+  controlspec=controlspec.new(0.5,1.5,'lin',0,0.93,'',0.01/1)}
   params:set_action("feedback",function(v)
     engine.feedback(v)
   end)
@@ -120,12 +120,13 @@ function Icarus:new(args)
   end)
   params:add {
     type='control',
-    id="destruction",
-    name="destruction",
-  controlspec=controlspec.new(0,3,'lin',0,0.0,'s',0.1/3)}
-  params:set_action("destruction",function(v)
-    engine.destruction(v)
+    id="tremelo",
+    name="tremelo",
+  controlspec=controlspec.new(0,30,'lin',0,0.0,'hz',0.1/30)}
+  params:set_action("tremelo",function(v)
+    engine.tremelo(v)
   end)
+  params:add_option("pressdisablesfeedback","press disables feedback",{"no","yes"},1)
   params:bang()
 
   clock.run(function()
@@ -169,7 +170,7 @@ function Icarus:off(note)
         print("icarus: turning off "..note)
       end
       -- TODO: make this behavior optional
-      if self.voice[i].feedback~=nil and self.voice[i].feedback>1 then
+      if params:get("pressdisablesfeedback")==2 and self.voice[i].feedback~=nil and self.voice[i].feedback>1 and params:get("feedback")==0.9 then
         params:set("feedback",self.voice[i].feedback)
         self.voice[i].feedback=nil
       end
@@ -222,11 +223,10 @@ function Icarus:get_voice(note)
   engine.icarusoff(oldest.i)
   self.voice[oldest.i].age=current_time()
   self.voice[oldest.i].note=note
-  -- TODO: make this a optional thing
-  -- if params:get("feedback")>1 then
-  --   self.voice[oldest.i].feedback=params:get("feedback")
-  -- params:set("feedback",0.9)
-  -- end
+  if params:get("pressdisablesfeedback")==2 and params:get("feedback")>1 then
+    self.voice[oldest.i].feedback=params:get("feedback")
+    params:set("feedback",0.9)
+  end
   return oldest.i
 end
 
