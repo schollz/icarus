@@ -31,6 +31,7 @@ function Icarus:new(args)
   -- TODO: add pwm modulation freq
   params:add_group("ICARUS",13)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
+  params:add_option("polyphony","polyphony",{"monophonic","polyphonic"},2)
   params:add {
     type='control',
     id="amp",
@@ -126,9 +127,17 @@ function Icarus:new(args)
     type='control',
     id="tremelo",
     name="tremelo",
-  controlspec=controlspec.new(0,30,'lin',0,0.0,'hz',0.1/30)}
+  controlspec=controlspec.new(0,64,'lin',0,0.0,'8th notes',1/64)}
   params:set_action("tremelo",function(v)
-    engine.tremelo(v)
+    engine.tremelo(v/(8*clock.get_beat_sec()))
+  end)
+  params:add {
+    type='control',
+    id="destruction",
+    name="destruction",
+  controlspec=controlspec.new(0,30,'lin',0,0.0,'hz',0.1/30)}
+  params:set_action("destruction",function(v)
+    engine.destruction(v)
   end)
   params:add_option("pressdisablesfeedback","press disables feedback",{"no","yes"},1)
   params:bang()
@@ -160,8 +169,7 @@ function Icarus:on(note,velocity)
   voice=self:get_voice(note)
   engine.icaruson(
     voice,
-    MusicUtil.note_num_to_freq(note)
-  )
+  MusicUtil.note_num_to_freq(note))
   return voice
 end
 
@@ -188,12 +196,17 @@ end
 
 function Icarus:get_voice(note)
   local oldest={i=0,age=0}
+  if params:get("polyphony")==1 then
+    oldest.i=1
+  end
 
-  -- gets voice if its already a note
-  for i,voice in ipairs(self.voice) do
-    if voice.note==note then
-      print("voice note "..i..note)
-      oldest={i=i,age=voice.age}
+  if oldest.i==0 then
+    -- gets voice if its already a note
+    for i,voice in ipairs(self.voice) do
+      if voice.note==note then
+        print("voice note "..i..note)
+        oldest={i=i,age=voice.age}
+      end
     end
   end
 

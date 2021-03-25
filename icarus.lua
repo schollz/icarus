@@ -1,9 +1,9 @@
 -- icarus v1.0.0
 --
--- I warn you, fly a middle 
--- course: go too low & water 
--- will weigh you down; 
--- go too high and the sun's 
+-- I warn you, fly a middle
+-- course: go too low & water
+-- will weigh you down;
+-- go too high and the sun's
 -- fire will burn you.
 -- keep to the middle way.
 --
@@ -84,7 +84,7 @@ end
 function enc(k,d)
   if k==1 then
     params:delta("lpf",-1*sign(d))
-  elseif k==2 then 
+  elseif k==2 then
     params:delta("delaytime",-d)
     if params:get("delaytime")<25 then
       params:delta("tremelo",d)
@@ -182,4 +182,4 @@ end
 function osc_in(path,args,from)
   vol_target=util.linlin(0,0.15,0,1,args[2])
 end
- 
+
