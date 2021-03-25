@@ -1,4 +1,4 @@
--- icarus v0.0.1
+-- icarus v1.0.0
 --
 -- I warn you, fly a middle 
 -- course: go too low & water 
