@@ -1,4 +1,8 @@
 -- icarus v0.0.1
+--
+-- plug in a midi keyboard first
+-- sounds change with the sun
+-- change the sun with E1/2/3
 
 engine.name="Icarus"
 icarus=include("icarus/lib/icarus")
