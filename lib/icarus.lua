@@ -29,7 +29,7 @@ function Icarus:new(args)
   -- TODO: add pwm center value
   -- TODO: add pwm width
   -- TODO: add pwm modulation freq
-  params:add_group("ICARUS",13)
+  params:add_group("ICARUS",18)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
   params:add_option("polyphony","polyphony",{"monophonic","polyphonic"},2)
   params:add {
@@ -106,6 +106,7 @@ function Icarus:new(args)
   params:set_action("feedback",function(v)
     engine.feedback(v)
   end)
+  params:add_option("pressdisablesfeedback","press disables feedback",{"no","yes"},1)
   params:add {
     type='control',
     id="delaytime",
@@ -139,7 +140,30 @@ function Icarus:new(args)
   params:set_action("destruction",function(v)
     engine.destruction(v)
   end)
-  params:add_option("pressdisablesfeedback","press disables feedback",{"no","yes"},1)
+  params:add {
+    type='control',
+    id="pwmcenter",
+    name="pwm center",
+  controlspec=controlspec.new(0,1,'lin',0,0.5,'',0.1/1)}
+  params:set_action("pwmcenter",function(v)
+    engine.pwmcenter(v)
+  end)
+  params:add {
+    type='control',
+    id="pwmwidth",
+    name="pwm width",
+  controlspec=controlspec.new(0,1,'lin',0,0.05,'',0.01/1)}
+  params:set_action("pwmwidth",function(v)
+    engine.pwmwidth(v)
+  end)
+  params:add {
+    type='control',
+    id="pwmfreq",
+    name="pwm freq",
+  controlspec=controlspec.new(0,200,'lin',0,3,'hz',1/200)}
+  params:set_action("pwmfreq",function(v)
+    engine.pwmfreq(v)
+  end)
   params:bang()
 
   clock.run(function()

@@ -182,6 +182,12 @@ Engine_Icarus : CroneEngine {
 			});
 		});
 
+		this.addCommand("tremelo","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\tremelo,msg[1]);
+			});
+		});
+
 		this.addCommand("lpf","f", { arg msg;
 			(0..5).do({arg i; 
 				icarusPlayer[i].set(\lpf,msg[1]);
@@ -197,6 +203,22 @@ Engine_Icarus : CroneEngine {
 		this.addCommand("sub","f", { arg msg;
 			(0..5).do({arg i; 
 				icarusPlayer[i].set(\sublevel,msg[1]);
+			});
+		});
+
+		this.addCommand("pwmcenter","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\pwmcenter,msg[1]);
+			});
+		});
+		this.addCommand("pwmwidth","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\pwmwidth,msg[1]);
+			});
+		});
+		this.addCommand("pwmfreq","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\pwmfreq,msg[1]);
 			});
 		});
 
