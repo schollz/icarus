@@ -21,6 +21,10 @@ local Formatters=require 'formatters'
 local feedback_temp=0
 local vol_current=0
 local vol_target=0
+local time_change=0
+local time_button=false
+local filter_change=0
+local filter_button=false
 
 function init()
   skeys=icarus:new()
@@ -99,7 +103,11 @@ end
 
 function key(k,z)
   -- TODO: press k2 to activate momentary delay
-  if k==3 then
+  if k==1 then
+    filter_button=true
+  elseif k==2 then
+    time_button=true
+  elseif k==3 then
     if z==1 then
       feedback_temp=params:get("feedback")
       params:set("feedback",0.85)
@@ -111,6 +119,21 @@ end
 
 function redraw_clock() -- our grid redraw clock
   while true do -- while it's running...
+    -- if time button is on, do some shifting
+    if time_button then
+      time_change=time_change-1
+      params:delta("delaytime",-1)
+    elseif time_change<0 then
+      time_change=time_change+1
+      params:delta("delaytime",1)
+    end
+    if filter_button then
+      filter_change=filter_change-1
+      params:delta("lpf",-1)
+    elseif filter_change<0 then
+      filter_change=filter_change+1
+      params:delta("lpf",1)
+    end
     -- have this clock move target volume to current volume
     vol_current=vol_current+sign(vol_target-vol_current)/200
     -- print(vol_current,vol_target)
