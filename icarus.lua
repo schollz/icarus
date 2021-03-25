@@ -72,9 +72,9 @@ end
 
 function enc(k,d)
   if k==1 then
-    params:delta("lpf",d)
+    params:delta("lpf",-1*sign(d))
   elseif k==2 then 
-    params:delta("delaytime",d)
+    params:delta("delaytime",-d)
   elseif k==3 then
     params:delta("feedback",d)
   end
@@ -95,7 +95,8 @@ end
 function redraw_clock() -- our grid redraw clock
   while true do -- while it's running...
     -- have this clock move target volume to current volume
-    vol_current=vol_current+sign(vol_target-vol_current)/10
+    vol_current=vol_current+sign(vol_target-vol_current)/200
+    print(vol_current,vol_target)
     clock.sleep(1/30) -- refresh
     redraw()
   end
@@ -105,10 +106,10 @@ function redraw()
   screen.clear()
 
   -- make the sun curve in the sky based on delay time
-  local delay_range=params:get_range("delaytime")
-  local rdelay=util.linlin(delay_range[1],delay_range[2],-90,90,params:get("delaytime"))
+  local delay_range={23,26}
+  local rdelay=util.linlin(delay_range[1],delay_range[2],90,270,params:get("delaytime"))
   local center={64,32}
-  local rpos={center[1]+32*math.sin(math.rad(rdelay)),center[2]+32*math.cos(math.rad(rdelay))}
+  local rpos={center[1]+40*math.sin(math.rad(rdelay)),center[2]+40*math.cos(math.rad(rdelay))}
   local rfeedback=util.linlin(0.9,1.5,0,16,params:get("feedback"))
   local rvolume=util.linlin(0,1,0,144,vol_current)
   local rlow=rfeedback
@@ -117,22 +118,28 @@ function redraw()
     local ll=math.floor(util.linlin(rlow,rhigh,14,1,i))
     screen.level(ll)
     i=i*math.pow(2.1,1/ll)
-    screen.circle(rpos[1],rpos[2],i)
+    screen.circle(rpos[1],rpos[2]+10,i)
     screen.fill()
   end
   screen.level(15)
-  screen.circle(rpos[1],rpos[2],rfeedback)
+  screen.circle(rpos[1],rpos[2]+10,rfeedback)
   screen.fill()
   -- the ocean
   local rfilter=util.linlin(0,18000,0,64,params:get("lpf"))
-  screen.level(15)
-  screen.rect(0,rfilter,65,65)
+  screen.level(0)
+  screen.rect(0,rfilter,129,65)
+  screen.fill()
   -- draw reflection of the sun in the water
+  screen.level(1)
+  screen.move(0,rfilter)
+  screen.line(129,rfilter)
+  screen.stroke()
   screen.level(10)
-  for level,i in ipairs({2,4,6,8,10,12,14}) do
-    screen.level(11-level)
-    screen.move(rpos[1]-rfeedback/i,rfilter+i)
-    screen.line(rpos[1]+rfeedback/i,rfilter+i)
+  for i=1,10 do
+    screen.level(11-i)
+    screen.move(rpos[1]-rfeedback/i*0.8,rfilter+i*2)
+    screen.line(rpos[1]+rfeedback/i*0.8,rfilter+i*2)
+    screen.stroke()
   end
   screen.update()
 end

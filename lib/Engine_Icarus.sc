@@ -39,7 +39,7 @@ Engine_Icarus : CroneEngine {
 				// try using SawTooth for PWM
 				in = Splay.ar(Pulse.ar(Lag.kr(hz+(
 					SinOsc.kr(LFNoise0.kr(1))*
-					(((hz).cpsmidi+1).midicps-(hz))/5
+					(((hz).cpsmidi+1).midicps-(hz))/10
 					),portamento),
 						LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
 						// LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
@@ -47,7 +47,7 @@ Engine_Icarus : CroneEngine {
 				// add suboscillator
 				in = in + (sublevel*Splay.ar(Pulse.ar(Lag.kr(hz/2+(
 					SinOsc.kr(LFNoise0.kr(1))*
-					(((hz/2).cpsmidi+1).midicps-(hz/2))/5
+					(((hz/2).cpsmidi+1).midicps-(hz/2))/10
 					),portamento),
 						LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
 						// LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
@@ -93,7 +93,7 @@ Engine_Icarus : CroneEngine {
 					Pan2.ar(snd[0],-1+(2*pan),amp),
 					Pan2.ar(snd[1],1+(2*pan),amp),
 				]);
-			    SendTrig.kr(Dust.kr(10.0),0,Amplitude.kr(snd[0]+snd[1],3,3));
+			    SendTrig.kr(Dust.kr(30.0),0,Amplitude.kr(snd[0]+snd[1],3,3));
 				Out.ar(0,snd)
 			}).add;	
 		});

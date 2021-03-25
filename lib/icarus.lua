@@ -171,6 +171,7 @@ function Icarus:off(note)
       -- TODO: make this behavior optional
       if self.voice[i].feedback~=nil and self.voice[i].feedback>1 then
         params:set("feedback",self.voice[i].feedback)
+        self.voice[i].feedback=nil
       end
       self.voice[i].age=current_time()
       self.voice[i].note=0
@@ -221,10 +222,10 @@ function Icarus:get_voice(note)
   engine.icarusoff(oldest.i)
   self.voice[oldest.i].age=current_time()
   self.voice[oldest.i].note=note
-  if params:get("feedback")>1 then
-    self.voice[oldest.i].feedback=params:get("feedback")
-  end
-  params:set("feedback",0.9)
+  -- if params:get("feedback")>1 then
+  --   self.voice[oldest.i].feedback=params:get("feedback")
+  -- end
+  -- params:set("feedback",0.9)
   return oldest.i
 end
 
