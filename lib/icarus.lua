@@ -222,10 +222,11 @@ function Icarus:get_voice(note)
   engine.icarusoff(oldest.i)
   self.voice[oldest.i].age=current_time()
   self.voice[oldest.i].note=note
+  -- TODO: make this a optional thing
   -- if params:get("feedback")>1 then
   --   self.voice[oldest.i].feedback=params:get("feedback")
-  -- end
   -- params:set("feedback",0.9)
+  -- end
   return oldest.i
 end
 
