@@ -1,8 +1,18 @@
 -- icarus v0.0.1
 --
--- plug in a midi keyboard first
--- sounds change with the sun
--- change the sun with E1/2/3
+-- I warn you, fly a middle 
+-- course: go too low & water 
+-- will weigh you down; 
+-- go too high and the sun's 
+-- fire will burn you.
+-- keep to the middle way.
+--
+-- (plug in midi keyboard first)
+-- E1 = filter
+-- E2 = time
+-- E3 = feedback
+-- speeding up time more easily
+-- destroys the sun
 
 engine.name="Icarus"
 icarus=include("icarus/lib/icarus")
