@@ -20,6 +20,10 @@
 
 moving time forward causes the sun to more easily collapse. moving time backward causes the sun to more easily explode.
 
+## todo
+
+- make some presets?
+
 ## download
 
 `;install https://github.com/schollz/icarus`
