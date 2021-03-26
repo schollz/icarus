@@ -42,7 +42,7 @@ Engine_Icarus : CroneEngine {
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz).cpsmidi+1).midicps-(hz))*detuning
 					),portamento),
-						LFTri.kr(pwmfreq,mul:pwmwidth/2,add:pwmcenter)
+						LFTri.kr(pwmfreq+rrand(0.1+0.3),mul:pwmwidth/2,add:pwmcenter)
 						//LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
 						// LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
 				));
@@ -51,7 +51,8 @@ Engine_Icarus : CroneEngine {
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz/2).cpsmidi+1).midicps-(hz/2))/10
 					),portamento),
-						LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
+						LFTri.kr(pwmfreq+rrand(0.1+0.3),mul:pwmwidth/2,add:pwmcenter)
+						// LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
 						// LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
 				)));
 				in = Balance2.ar(in[0] ,in[1],SinOsc.kr(
@@ -80,7 +81,7 @@ Engine_Icarus : CroneEngine {
 				        gate: Dust.kr(destruction)
 				))))+local)/2;
 				// add tremelo
-                                local = local * ((tremelo>0)*SinOsc.kr(tremelo,0,0.4));
+                // local = local * ((tremelo>0)*SinOsc.kr(tremelo,0,0.4)+(tremelo<0.0001));
 
 
 

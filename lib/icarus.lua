@@ -25,11 +25,7 @@ function Icarus:new(args)
 
   local debounce_delaytime=0
 
-  -- TODO: add polyphony options
-  -- TODO: add pwm center value
-  -- TODO: add pwm width
-  -- TODO: add pwm modulation freq
-  params:add_group("ICARUS",18)
+  params:add_group("ICARUS",17)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
   params:add_option("polyphony","polyphony",{"monophonic","polyphonic"},2)
   params:add {
@@ -44,7 +40,7 @@ function Icarus:new(args)
     type='control',
     id="sub",
     name="sub",
-  controlspec=controlspec.new(0,10,'lin',0,1.0,'amp')}
+  controlspec=controlspec.new(0,10,'lin',0,0.5,'amp')}
   params:set_action("sub",function(v)
     engine.sub(v)
   end)
@@ -124,14 +120,14 @@ function Icarus:new(args)
   params:set_action("portamento",function(v)
     engine.portamento(v)
   end)
-  params:add {
-    type='control',
-    id="tremelo",
-    name="tremelo",
-  controlspec=controlspec.new(0,64,'lin',0,0.0,'8th notes',1/64)}
-  params:set_action("tremelo",function(v)
-    engine.tremelo(v/(8*clock.get_beat_sec()))
-  end)
+  -- params:add {
+  --   type='control',
+  --   id="tremelo",
+  --   name="tremelo",
+  -- controlspec=controlspec.new(0,64,'lin',0,0.0,'8th notes',1/64)}
+  -- params:set_action("tremelo",function(v)
+  --   engine.tremelo(v/(clock.get_beat_sec()/8))
+  -- end)
   params:add {
     type='control',
     id="destruction",

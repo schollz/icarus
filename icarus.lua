@@ -104,9 +104,9 @@ end
 function key(k,z)
   -- TODO: press k2 to activate momentary delay
   if k==1 then
-    filter_button=true
+    filter_button=z==1
   elseif k==2 then
-    time_button=true
+    time_button=z==1
   elseif k==3 then
     if z==1 then
       feedback_temp=params:get("feedback")
@@ -122,17 +122,17 @@ function redraw_clock() -- our grid redraw clock
     -- if time button is on, do some shifting
     if time_button then
       time_change=time_change-1
-      params:delta("delaytime",-1)
+      params:delta("delaytime",3)
     elseif time_change<0 then
       time_change=time_change+1
-      params:delta("delaytime",1)
+      params:delta("delaytime",-3)
     end
     if filter_button then
       filter_change=filter_change-1
-      params:delta("lpf",-1)
+      params:delta("lpf",-2)
     elseif filter_change<0 then
       filter_change=filter_change+1
-      params:delta("lpf",1)
+      params:delta("lpf",2)
     end
     -- have this clock move target volume to current volume
     vol_current=vol_current+sign(vol_target-vol_current)/200
