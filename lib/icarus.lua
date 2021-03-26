@@ -201,7 +201,6 @@ function Icarus:off(note)
       if self.debug then
         print("icarus: turning off "..note)
       end
-      -- TODO: make this behavior optional
       if params:get("pressdisablesfeedback")==2 and self.voice[i].feedback~=nil and self.voice[i].feedback>1 and params:get("feedback")==0.9 then
         params:set("feedback",self.voice[i].feedback)
         self.voice[i].feedback=nil

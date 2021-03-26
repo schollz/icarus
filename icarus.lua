@@ -103,7 +103,6 @@ function enc(k,d)
 end
 
 function key(k,z)
-  -- TODO: press k2 to activate momentary delay
   if k==1 then
     time_button=z==1
   elseif k==2 then
