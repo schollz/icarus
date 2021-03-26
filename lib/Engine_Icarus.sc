@@ -18,7 +18,8 @@ Engine_Icarus : CroneEngine {
 			SynthDef("icarussynth"++i,{ 
 				arg amp=0.5, hz=220, pan=0, envgate=0,
 				attack=0.015,decay=1,release=2,sustain=0.9,
-				lpf=20000,portamento=0.1,tremelo=0,
+				lpf=20000,portamento=0.1,tremelo=0,destruction=0,
+				pwmcenter=0.5,pwmwidth=0.05,pwmfreq=10,detuning=0.1,
 				feedback=0.5,delaytime=0.25, sublevel=0;
 
 				// vars
@@ -39,9 +40,10 @@ Engine_Icarus : CroneEngine {
 				// try using SawTooth for PWM
 				in = Splay.ar(Pulse.ar(Lag.kr(hz+(
 					SinOsc.kr(LFNoise0.kr(1))*
-					(((hz).cpsmidi+1).midicps-(hz))/10
+					(((hz).cpsmidi+1).midicps-(hz))*detuning
 					),portamento),
-						LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
+						LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter)
+						//LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
 						// LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
 				));
 				// add suboscillator
@@ -49,7 +51,8 @@ Engine_Icarus : CroneEngine {
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz/2).cpsmidi+1).midicps-(hz/2))/10
 					),portamento),
-						LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
+						LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter)
+						// LFTri.kr(LFNoise0.kr(1)*3).range(0.45,0.55)
 						// LinLin.kr(SinOsc.kr(LFNoise0.kr(1)*3),-1,1,0.45,0.55)
 				)));
 				in = Balance2.ar(in[0] ,in[1],SinOsc.kr(
@@ -68,15 +71,17 @@ Engine_Icarus : CroneEngine {
 			    local = LeakDC.ar(local);
 			    local = ((local + in) * 1.25).softclip;
 			    local = MoogLadder.ar(local,Lag.kr(lpf,1));
-				// add tremelo thing
+				// add destruction thing
 				local = ((local*((1-EnvGen.kr(
 				        Env(
 				            levels: [0, 1,0], 
 				            times: [0.1,0.1],
 							curve:\sine,
 				        ),
-				        gate: Dust.kr(tremelo)
+				        gate: Dust.kr(destruction)
 				))))+local)/2;
+				// add tremelo
+                // local = local * ((tremelo>0)*SinOsc.kr(tremelo,0,0.4)+(tremelo<0.0001));
 
 
 
@@ -172,6 +177,12 @@ Engine_Icarus : CroneEngine {
 			});
 		});
 
+		this.addCommand("destruction","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\destruction,msg[1]);
+			});
+		});
+
 		this.addCommand("tremelo","f", { arg msg;
 			(0..5).do({arg i; 
 				icarusPlayer[i].set(\tremelo,msg[1]);
@@ -193,6 +204,22 @@ Engine_Icarus : CroneEngine {
 		this.addCommand("sub","f", { arg msg;
 			(0..5).do({arg i; 
 				icarusPlayer[i].set(\sublevel,msg[1]);
+			});
+		});
+
+		this.addCommand("pwmcenter","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\pwmcenter,msg[1]);
+			});
+		});
+		this.addCommand("pwmwidth","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\pwmwidth,msg[1]);
+			});
+		});
+		this.addCommand("pwmfreq","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\pwmfreq,msg[1]);
 			});
 		});
 

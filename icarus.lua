@@ -1,16 +1,17 @@
--- icarus v0.0.1
+-- icarus v1.0.0
 --
--- I warn you, fly a middle 
--- course: go too low & water 
--- will weigh you down; 
--- go too high and the sun's 
+-- I warn you, fly a middle
+-- course: go too low & water
+-- will weigh you down;
+-- go too high and the sun's
 -- fire will burn you.
 -- keep to the middle way.
 --
 -- (plug in midi keyboard first)
--- E1 = filter
--- E2 = time
+-- E1 = time
+-- E2 = filter
 -- E3 = feedback
+-- K1,2,3 bounce
 -- speeding up time more easily
 -- destroys the sun
 
@@ -21,6 +22,10 @@ local Formatters=require 'formatters'
 local feedback_temp=0
 local vol_current=0
 local vol_target=0
+local time_change=0
+local time_button=false
+local filter_change=0
+local filter_button=false
 
 function init()
   skeys=icarus:new()
@@ -83,23 +88,26 @@ end
 
 function enc(k,d)
   if k==1 then
-    params:delta("lpf",-1*sign(d))
-  elseif k==2 then 
     params:delta("delaytime",-d)
     if params:get("delaytime")<25 then
-      params:delta("tremelo",d)
+      params:delta("destruction",d)
       params:set("pressdisablesfeedback",2)
     else
       params:set("pressdisablesfeedback",1)
     end
+  elseif k==2 then
+    params:delta("lpf",-1*sign(d))
   elseif k==3 then
     params:delta("feedback",d)
   end
 end
 
 function key(k,z)
-  -- TODO: press k2 to activate momentary delay
-  if k==3 then
+  if k==1 then
+    time_button=z==1
+  elseif k==2 then
+    filter_button=z==1
+  elseif k==3 then
     if z==1 then
       feedback_temp=params:get("feedback")
       params:set("feedback",0.85)
@@ -111,8 +119,25 @@ end
 
 function redraw_clock() -- our grid redraw clock
   while true do -- while it's running...
+    -- if time button is on, do some shifting
+    if time_button then
+      time_change=time_change-1
+      params:delta("delaytime",3)
+    elseif time_change<0 then
+      time_change=time_change+1
+      params:delta("delaytime",-3)
+    end
+    if filter_button then
+      filter_change=filter_change-1
+      params:delta("lpf",-1)
+    elseif filter_change<0 then
+      filter_change=filter_change+1
+      params:delta("lpf",1)
+    end
     -- have this clock move target volume to current volume
-    vol_current=vol_current+sign(vol_target-vol_current)/200
+    if math.abs(vol_target-vol_current) > 0.005 then
+      vol_current=vol_current+sign(vol_target-vol_current)/200
+    end
     -- print(vol_current,vol_target)
     clock.sleep(1/30) -- refresh
     redraw()
@@ -182,4 +207,4 @@ end
 function osc_in(path,args,from)
   vol_target=util.linlin(0,0.15,0,1,args[2])
 end
- 
+

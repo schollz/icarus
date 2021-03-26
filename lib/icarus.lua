@@ -25,9 +25,9 @@ function Icarus:new(args)
 
   local debounce_delaytime=0
 
-  -- TODO: add polyphony options
-  params:add_group("ICARUS",13)
+  params:add_group("ICARUS",17)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
+  params:add_option("polyphony","polyphony",{"monophonic","polyphonic"},2)
   params:add {
     type='control',
     id="amp",
@@ -40,7 +40,7 @@ function Icarus:new(args)
     type='control',
     id="sub",
     name="sub",
-  controlspec=controlspec.new(0,10,'lin',0,1.0,'amp')}
+  controlspec=controlspec.new(0,10,'lin',0,0.5,'amp')}
   params:set_action("sub",function(v)
     engine.sub(v)
   end)
@@ -102,6 +102,7 @@ function Icarus:new(args)
   params:set_action("feedback",function(v)
     engine.feedback(v)
   end)
+  params:add_option("pressdisablesfeedback","press disables feedback",{"no","yes"},1)
   params:add {
     type='control',
     id="delaytime",
@@ -119,15 +120,46 @@ function Icarus:new(args)
   params:set_action("portamento",function(v)
     engine.portamento(v)
   end)
+  -- params:add {
+  --   type='control',
+  --   id="tremelo",
+  --   name="tremelo",
+  -- controlspec=controlspec.new(0,64,'lin',0,0.0,'8th notes',1/64)}
+  -- params:set_action("tremelo",function(v)
+  --   engine.tremelo(v/(clock.get_beat_sec()/8))
+  -- end)
   params:add {
     type='control',
-    id="tremelo",
-    name="tremelo",
+    id="destruction",
+    name="destruction",
   controlspec=controlspec.new(0,30,'lin',0,0.0,'hz',0.1/30)}
-  params:set_action("tremelo",function(v)
-    engine.tremelo(v)
+  params:set_action("destruction",function(v)
+    engine.destruction(v)
   end)
-  params:add_option("pressdisablesfeedback","press disables feedback",{"no","yes"},1)
+  params:add {
+    type='control',
+    id="pwmcenter",
+    name="pwm center",
+  controlspec=controlspec.new(0,1,'lin',0,0.5,'',0.1/1)}
+  params:set_action("pwmcenter",function(v)
+    engine.pwmcenter(v)
+  end)
+  params:add {
+    type='control',
+    id="pwmwidth",
+    name="pwm width",
+  controlspec=controlspec.new(0,1,'lin',0,0.05,'',0.01/1)}
+  params:set_action("pwmwidth",function(v)
+    engine.pwmwidth(v)
+  end)
+  params:add {
+    type='control',
+    id="pwmfreq",
+    name="pwm freq",
+  controlspec=controlspec.new(0,200,'lin',0,3,'hz',1/200)}
+  params:set_action("pwmfreq",function(v)
+    engine.pwmfreq(v)
+  end)
   params:bang()
 
   clock.run(function()
@@ -157,8 +189,7 @@ function Icarus:on(note,velocity)
   voice=self:get_voice(note)
   engine.icaruson(
     voice,
-    MusicUtil.note_num_to_freq(note)
-  )
+  MusicUtil.note_num_to_freq(note))
   return voice
 end
 
@@ -170,7 +201,6 @@ function Icarus:off(note)
       if self.debug then
         print("icarus: turning off "..note)
       end
-      -- TODO: make this behavior optional
       if params:get("pressdisablesfeedback")==2 and self.voice[i].feedback~=nil and self.voice[i].feedback>1 and params:get("feedback")==0.9 then
         params:set("feedback",self.voice[i].feedback)
         self.voice[i].feedback=nil
@@ -185,12 +215,17 @@ end
 
 function Icarus:get_voice(note)
   local oldest={i=0,age=0}
+  if params:get("polyphony")==1 then
+    oldest.i=1
+  end
 
-  -- gets voice if its already a note
-  for i,voice in ipairs(self.voice) do
-    if voice.note==note then
-      print("voice note "..i..note)
-      oldest={i=i,age=voice.age}
+  if oldest.i==0 then
+    -- gets voice if its already a note
+    for i,voice in ipairs(self.voice) do
+      if voice.note==note then
+        print("voice note "..i..note)
+        oldest={i=i,age=voice.age}
+      end
     end
   end
 

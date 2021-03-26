@@ -14,11 +14,15 @@
 
 (plug in midi keyboard first)
 
-- E1 = filter
-- E2 = time
+- E1 = time
+- E2 = filter
 - E3 = feedback
 
 moving time forward causes the sun to more easily collapse. moving time backward causes the sun to more easily explode.
+
+## todo
+
+- make some presets?
 
 ## download
 
