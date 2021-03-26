@@ -8,9 +8,10 @@
 -- keep to the middle way.
 --
 -- (plug in midi keyboard first)
--- E1 = filter
--- E2 = time
+-- E1 = time
+-- E2 = filter
 -- E3 = feedback
+-- K1,2,3 bounce
 -- speeding up time more easily
 -- destroys the sun
 
@@ -87,15 +88,15 @@ end
 
 function enc(k,d)
   if k==1 then
-    params:delta("lpf",-1*sign(d))
-  elseif k==2 then
     params:delta("delaytime",-d)
     if params:get("delaytime")<25 then
-      params:delta("tremelo",d)
+      params:delta("destruction",d)
       params:set("pressdisablesfeedback",2)
     else
       params:set("pressdisablesfeedback",1)
     end
+  elseif k==2 then
+    params:delta("lpf",-1*sign(d))
   elseif k==3 then
     params:delta("feedback",d)
   end
@@ -104,9 +105,9 @@ end
 function key(k,z)
   -- TODO: press k2 to activate momentary delay
   if k==1 then
-    filter_button=z==1
-  elseif k==2 then
     time_button=z==1
+  elseif k==2 then
+    filter_button=z==1
   elseif k==3 then
     if z==1 then
       feedback_temp=params:get("feedback")
@@ -129,13 +130,15 @@ function redraw_clock() -- our grid redraw clock
     end
     if filter_button then
       filter_change=filter_change-1
-      params:delta("lpf",-2)
+      params:delta("lpf",-1)
     elseif filter_change<0 then
       filter_change=filter_change+1
-      params:delta("lpf",2)
+      params:delta("lpf",1)
     end
     -- have this clock move target volume to current volume
-    vol_current=vol_current+sign(vol_target-vol_current)/200
+    if math.abs(vol_target-vol_current) > 0.005 then
+      vol_current=vol_current+sign(vol_target-vol_current)/200
+    end
     -- print(vol_current,vol_target)
     clock.sleep(1/30) -- refresh
     redraw()
