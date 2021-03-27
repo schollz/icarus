@@ -55,14 +55,12 @@ function setup_midi()
         if mididevice[name].active==false then
           do return end
         end
-        if (data[1]==144 or data[1]==128) then
-          -- tab.print(data)
-          if data[1]==144 and data[3]>0 then
-            skeys:on(data[2])
-          elseif data[1]==128 or data[3]==0 then
-            skeys:off(data[2])
+	local d = midi.to_msg(data)
+          if d.type=="note_on" then
+            skeys:on(d.note)
+          elseif d.type=="note_off" then
+            skeys:off(d.note)
           end
-        end
       end
     end
   end
