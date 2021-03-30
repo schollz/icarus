@@ -25,7 +25,7 @@ function Icarus:new(args)
 
   local debounce_delaytime=0
 
-  params:add_group("ICARUS",19)
+  params:add_group("ICARUS",21)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
   params:add_option("polyphony","polyphony",{"monophonic","polyphonic"},2)
   params:add {

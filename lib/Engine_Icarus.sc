@@ -37,8 +37,7 @@ Engine_Icarus : CroneEngine {
 					gate: envgate,
 				);
 
-				// dreamcrusher
-				// try using SawTooth for PWM
+				// dreamcrusher++
 				in = Splay.ar(
 				(pulse*
 				Pulse.ar(Lag.kr(hz+(
