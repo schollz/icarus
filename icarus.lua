@@ -96,13 +96,13 @@ end
 
 function enc(k,d)
   if k==1 then
-    params:delta("delaytime",-d)
-    if params:get("delaytime")<25 then
-      params:delta("destruction",d)
-      params:set("pressdisablesfeedback",2)
-    else
-      params:set("pressdisablesfeedback",1)
-    end
+    params:delta("delaytime",d)
+    -- if params:get("delaytime")<0.25 then
+    --   params:delta("destruction",d)
+    --   params:set("pressdisablesfeedback",2)
+    -- else
+    --   params:set("pressdisablesfeedback",1)
+    -- end
   elseif k==2 then
     params:delta("lpf",-1*sign(d))
   elseif k==3 then
@@ -156,8 +156,8 @@ function redraw()
   screen.clear()
 
   -- make the sun curve in the sky based on delay time
-  local delay_range={23,27}
-  local rdelay=util.linlin(delay_range[1],delay_range[2],90,270,params:get("delaytime"))
+  local delay_range={0.05,0.5}
+  local rdelay=util.linlin(delay_range[1],delay_range[2],270,90,params:get("delaytime"))
   local center={64,32}
   local rpos={center[1]+40*math.sin(math.rad(rdelay)),center[2]+40*math.cos(math.rad(rdelay))}
   local rfeedback=util.linlin(0.9,1.5,0,16,params:get("feedback"))

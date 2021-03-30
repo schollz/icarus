@@ -25,7 +25,7 @@ function Icarus:new(args)
 
   local debounce_delaytime=0
 
-  params:add_group("ICARUS",18)
+  params:add_group("ICARUS",19)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
   params:add_option("polyphony","polyphony",{"monophonic","polyphonic"},2)
   params:add {
@@ -107,17 +107,29 @@ function Icarus:new(args)
     type='control',
     id="feedback",
     name="feedback",
-  controlspec=controlspec.new(0.5,1.5,'lin',0,0.93,'',0.01/1)}
+  controlspec=controlspec.new(0.5,1.5,'lin',0,1.3,'',0.01/1)}
   params:set_action("feedback",function(v)
     engine.feedback(v)
   end)
   params:add_option("pressdisablesfeedback","press disables feedback",{"no","yes"},1)
+  local time_set_delaytime=clock.get_beat_sec()*clock.get_beats()
   params:add {
     type='control',
     id="delaytime",
     name="delay time",
-  controlspec=controlspec.new(0.05,0.5,'lin',0,0.25,'x100 s',0.01/0.45)}
+  controlspec=controlspec.new(0.05,0.5,'lin',0,0.25,'s')}
   params:set_action("delaytime",function(v)
+    -- local current_time=clock.get_beat_sec()*clock.get_beats()
+    -- local last_time_diff=current_time-time_set_delaytime
+    -- print(last_time_diff)
+    -- if last_time_diff > 0.5 then 
+    --   last_time_diff = 0.5
+    -- elseif last_time_diff < 0.0005 then
+    --   last_time_diff=0.0005
+    -- end
+    -- print(last_time_diff)
+    -- engine.delaytimelag(last_time_diff)
+    -- time_set_delaytime=current_time
     engine.delaytime(v)
     -- debounce_delaytime=v
   end)
@@ -128,6 +140,14 @@ function Icarus:new(args)
   controlspec=controlspec.new(0,3,'lin',0,0.1,'s',0.1/3)}
   params:set_action("portamento",function(v)
     engine.portamento(v)
+  end)
+  params:add {
+    type='control',
+    id="detuning",
+    name="detuning",
+  controlspec=controlspec.new(0,5,'lin',0,0.1,'hz',0.01/5)}
+  params:set_action("detuning",function(v)
+    engine.detuning(v)
   end)
   -- params:add {
   --   type='control',
