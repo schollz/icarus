@@ -1,4 +1,4 @@
--- icarus v1.0.1
+-- icarus v1.1.0
 --
 -- I warn you, fly a middle
 -- course: go too low & water
@@ -40,6 +40,10 @@ function setup_midi()
   -- get list of devices
   local mididevice={}
   local mididevice_list={"none"}
+  midi_channels={"all"}
+  for i=1,16 do
+    table.insert(midi_channels,i)
+  end
   for _,dev in pairs(midi.devices) do
     if dev.port~=nil then
       local name=string.lower(dev.name)
@@ -55,12 +59,18 @@ function setup_midi()
         if mididevice[name].active==false then
           do return end
         end
-	local d = midi.to_msg(data)
-          if d.type=="note_on" then
-            skeys:on(d.note)
-          elseif d.type=="note_off" then
-            skeys:off(d.note)
-          end
+        local d=midi.to_msg(data)
+        --if d.type~="clock" then
+        --  tab.print(d)
+        --end
+        if d.ch~=midi_channels[params:get("midichannel")] and params:get("midichannel")>1 then
+          do return end
+        end
+        if d.type=="note_on" then
+          skeys:on(d.note)
+        elseif d.type=="note_off" then
+          skeys:off(d.note)
+        end
       end
     end
   end
@@ -76,7 +86,7 @@ function setup_midi()
     end
     mididevice[mididevice_list[v]].active=true
   end)
-
+  params:add{type="option",id="midichannel",name="midi ch",options=midi_channels,default=1}
 
   if #mididevice_list>1 then
     params:set("midi",2)
@@ -133,7 +143,7 @@ function redraw_clock() -- our grid redraw clock
       params:delta("lpf",1)
     end
     -- have this clock move target volume to current volume
-    if math.abs(vol_target-vol_current) > 0.005 then
+    if math.abs(vol_target-vol_current)>0.005 then
       vol_current=vol_current+sign(vol_target-vol_current)/200
     end
     -- print(vol_current,vol_target)
