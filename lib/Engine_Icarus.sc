@@ -18,7 +18,7 @@ Engine_Icarus : CroneEngine {
 			SynthDef("icarussynth"++i,{ 
 				arg amp=0.5, hz=220, pan=0, envgate=0,
 				attack=0.015,decay=1,release=2,sustain=0.9,
-				lpf=20000,portamento=0.1,tremelo=0,destruction=0,
+				lpf=20000,resonance=0,portamento=0.1,tremelo=0,destruction=0,
 				pwmcenter=0.5,pwmwidth=0.05,pwmfreq=10,detuning=0.1,
 				feedback=0.5,delaytime=0.25, sublevel=0;
 
@@ -66,7 +66,7 @@ Engine_Icarus : CroneEngine {
 				);
 			    local = LeakDC.ar(local);
 			    local = ((local + in) * 1.25).softclip;
-			    local = MoogLadder.ar(local,Lag.kr(lpf,1));
+			    local = MoogLadder.ar(local,Lag.kr(lpf,1),res:Lag.kr(resonance,1));
 				// add destruction thing
 				local = ((local*((1-EnvGen.kr(
 				        Env(
@@ -188,6 +188,11 @@ Engine_Icarus : CroneEngine {
 		this.addCommand("lpf","f", { arg msg;
 			(0..5).do({arg i; 
 				icarusPlayer[i].set(\lpf,msg[1]);
+			});
+		});
+		this.addCommand("resonance","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\resonance,msg[1]);
 			});
 		});
 

@@ -25,7 +25,7 @@ function Icarus:new(args)
 
   local debounce_delaytime=0
 
-  params:add_group("ICARUS",17)
+  params:add_group("ICARUS",18)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
   params:add_option("polyphony","polyphony",{"monophonic","polyphonic"},2)
   params:add {
@@ -93,6 +93,15 @@ function Icarus:new(args)
   }
   params:set_action("lpf",function(v)
     engine.lpf(v)
+  end)
+  params:add {
+    type='control',
+    id='resonance',
+    name='resonance',
+    controlspec=controlspec.new(0,0.95,'lin',0,0,'',0.01/0.95)
+  }
+  params:set_action("resonance",function(v)
+    engine.resonance(v)
   end)
   params:add {
     type='control',
