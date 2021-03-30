@@ -116,9 +116,9 @@ function Icarus:new(args)
     type='control',
     id="delaytime",
     name="delay time",
-  controlspec=controlspec.new(15,30,'lin',0,25,'x100 s',0.01/15)}
+  controlspec=controlspec.new(0.05,0.5,'lin',0,0.25,'x100 s',0.01/0.45)}
   params:set_action("delaytime",function(v)
-    engine.delaytime(v/100)
+    engine.delaytime(v)
     -- debounce_delaytime=v
   end)
   params:add {

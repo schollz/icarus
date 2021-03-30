@@ -38,22 +38,19 @@ Engine_Icarus : CroneEngine {
 
 				// dreamcrusher
 				// try using SawTooth for PWM
-				in = Splay.ar(VarSaw.ar(Lag.kr(hz+(
+				in = Splay.ar(Pulse.ar(Lag.kr(hz+(
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz).cpsmidi+1).midicps-(hz))*detuning
 					),portamento),
 					width:LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter)
 				));
 				// add suboscillator
-				in = in + (sublevel*Splay.ar(VarSaw.ar(Lag.kr(hz/2+(
+				in = in + (sublevel*Splay.ar(Pulse.ar(Lag.kr(hz/2+(
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz/2).cpsmidi+1).midicps-(hz/2))/10
 					),portamento),
 					width:LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter)
 				)));
-				in = Balance2.ar(in[0] ,in[1],SinOsc.kr(
-					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
-				)*0.1);
 				in = in * ender;
 			    ampcheck = Amplitude.kr(Mix.ar(in));
 			    in = in * (ampcheck > 0.02); // noise gate
@@ -61,8 +58,8 @@ Engine_Icarus : CroneEngine {
 			    local = OnePole.ar(local, 0.4);
 			    local = OnePole.ar(local, -0.08);
 			    local = Rotate2.ar(local[0], local[1],0.2);
-				local = DelayN.ar(local, 0.5,
-					Lag.kr(delaytime,0.05)+rrand(-0.05,0.05)
+				local = DelayC.ar(local, 0.5,
+					Lag.kr(delaytime,0.05)
 				);
 			    local = LeakDC.ar(local);
 			    local = ((local + in) * 1.25).softclip;
@@ -86,6 +83,9 @@ Engine_Icarus : CroneEngine {
 					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
 				)*0.1);
 				
+				snd= Balance2.ar(snd[0] ,snd[1],SinOsc.kr(
+					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
+				)*0.1);
 
 				// manual pan
 				snd = Mix.ar([
