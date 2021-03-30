@@ -38,6 +38,22 @@ function Icarus:new(args)
   end)
   params:add {
     type='control',
+    id="pulse",
+    name="pulse",
+  controlspec=controlspec.new(0,10,'lin',0,1.0,'amp')}
+  params:set_action("pulse",function(v)
+    engine.pulse(v)
+  end)
+  params:add {
+    type='control',
+    id="saw",
+    name="saw",
+  controlspec=controlspec.new(0,10,'lin',0,0.5,'amp')}
+  params:set_action("saw",function(v)
+    engine.saw(v)
+  end)
+  params:add {
+    type='control',
     id="sub",
     name="sub",
   controlspec=controlspec.new(0,10,'lin',0,0.5,'amp')}
@@ -145,9 +161,9 @@ function Icarus:new(args)
     type='control',
     id="detuning",
     name="detuning",
-  controlspec=controlspec.new(0,5,'lin',0,0.1,'hz',0.01/5)}
+  controlspec=controlspec.new(0,100,'lin',0,10,'cents',1/100)}
   params:set_action("detuning",function(v)
-    engine.detuning(v)
+    engine.detuning(v/100)
   end)
   -- params:add {
   --   type='control',

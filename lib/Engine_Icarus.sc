@@ -17,6 +17,7 @@ Engine_Icarus : CroneEngine {
 		(0..5).do({arg i; 
 			SynthDef("icarussynth"++i,{ 
 				arg amp=0.5, hz=220, pan=0, envgate=0,
+				pulse=0,saw=0,
 				attack=0.015,decay=1,release=2,sustain=0.9,
 				lpf=20000,resonance=0,portamento=0.1,tremelo=0,destruction=0,
 				pwmcenter=0.5,pwmwidth=0.05,pwmfreq=10,detuning=0.1,
@@ -39,6 +40,7 @@ Engine_Icarus : CroneEngine {
 				// dreamcrusher
 				// try using SawTooth for PWM
 				in = Splay.ar(
+				(pulse*
 				Pulse.ar(Lag.kr(hz+(
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz).cpsmidi+1).midicps-(hz))*detuning
@@ -46,8 +48,9 @@ Engine_Icarus : CroneEngine {
 					width:
 					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
 					mul:0.5
-				) 
+				))
 				+
+				(saw*
 				VarSaw.ar(Lag.kr(hz+(
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz).cpsmidi+1).midicps-(hz))*detuning
@@ -55,15 +58,32 @@ Engine_Icarus : CroneEngine {
 					width:
 					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
 					mul:0.5
-				)
+				))
 				);
-				// // add suboscillator
-				// in = in + (sublevel*Splay.ar(Pulse.ar(Lag.kr(hz/2+(
-				// 	SinOsc.kr(LFNoise0.kr(1))*
-				// 	(((hz/2).cpsmidi+1).midicps-(hz/2))/10
-				// 	),portamento),
-				// 	width:LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter)
-				// )));
+				// add suboscillator
+				in = in + (sublevel*Splay.ar(
+				(pulse*
+				Pulse.ar(Lag.kr(hz/2+(
+					SinOsc.kr(LFNoise0.kr(1))*
+					(((hz/2).cpsmidi+1).midicps-(hz/2))*detuning
+					),portamento),
+					width:
+					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
+					mul:0.5
+				))
+				+
+				(saw*
+				VarSaw.ar(Lag.kr(hz/2+(
+					SinOsc.kr(LFNoise0.kr(1))*
+					(((hz/2).cpsmidi+1).midicps-(hz/2))*detuning
+					),portamento),
+					width:
+					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
+					mul:0.5
+				))
+				));
+
+				// random panning
 				in = Balance2.ar(in[0] ,in[1],SinOsc.kr(
 					LinLin.kr(LFNoise0.kr(0.1),-1,1,0.05,0.2)
 				)*0.1);
@@ -226,6 +246,18 @@ Engine_Icarus : CroneEngine {
 		this.addCommand("detuning","f", { arg msg;
 			(0..5).do({arg i; 
 				icarusPlayer[i].set(\detuning,msg[1]);
+			});
+		});
+
+		this.addCommand("pulse","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\pulse,msg[1]);
+			});
+		});
+
+		this.addCommand("saw","f", { arg msg;
+			(0..5).do({arg i; 
+				icarusPlayer[i].set(\saw,msg[1]);
 			});
 		});
 
