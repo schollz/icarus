@@ -114,8 +114,7 @@ function Icarus:new(args)
     type='control',
     id='resonance',
     name='resonance',
-    controlspec=controlspec.new(0,0.95,'lin',0,0,'',0.01/0.95)
-  }
+  controlspec=controlspec.new(0,0.95,'lin',0,0,'',0.01/0.95)}
   params:set_action("resonance",function(v)
     engine.resonance(v)
   end)
@@ -138,7 +137,7 @@ function Icarus:new(args)
     -- local current_time=clock.get_beat_sec()*clock.get_beats()
     -- local last_time_diff=current_time-time_set_delaytime
     -- print(last_time_diff)
-    -- if last_time_diff > 0.5 then 
+    -- if last_time_diff > 0.5 then
     --   last_time_diff = 0.5
     -- elseif last_time_diff < 0.0005 then
     --   last_time_diff=0.0005
