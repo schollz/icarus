@@ -25,38 +25,38 @@ function Icarus:new(args)
 
   local debounce_delaytime=0
 
-  params:add_group("ICARUS",21)
+  params:add_group("ICARUS",19)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
   params:add_option("polyphony","polyphony",{"monophonic","polyphonic"},2)
   params:add {
     type='control',
     id="amp",
     name="amp",
-  controlspec=controlspec.new(0,10,'lin',0,1.0,'amp')}
+  controlspec=controlspec.new(0,2,'lin',0,1.0,'amp',0.01/2)}
   params:set_action("amp",function(v)
     engine.amp(v)
   end)
-  params:add {
-    type='control',
-    id="pulse",
-    name="pulse",
-  controlspec=controlspec.new(0,10,'lin',0,1.0,'amp')}
-  params:set_action("pulse",function(v)
-    engine.pulse(v)
-  end)
-  params:add {
-    type='control',
-    id="saw",
-    name="saw",
-  controlspec=controlspec.new(0,10,'lin',0,0.5,'amp')}
-  params:set_action("saw",function(v)
-    engine.saw(v)
-  end)
+  -- params:add {
+  --   type='control',
+  --   id="pulse",
+  --   name="pulse",
+  -- controlspec=controlspec.new(0,2,'lin',0,1.0,'amp',0.01/2)}
+  -- params:set_action("pulse",function(v)
+  --   engine.pulse(v)
+  -- end)
+  -- params:add {
+  --   type='control',
+  --   id="saw",
+  --   name="saw",
+  -- controlspec=controlspec.new(0,2,'lin',0,0.0,'amp',0.01/2)}
+  -- params:set_action("saw",function(v)
+  --   engine.saw(v)
+  -- end)
   params:add {
     type='control',
     id="sub",
     name="sub",
-  controlspec=controlspec.new(0,10,'lin',0,0.5,'amp')}
+  controlspec=controlspec.new(0,2,'lin',0,0.5,'amp',0.01/2)}
   params:set_action("sub",function(v)
     engine.sub(v)
   end)
@@ -72,7 +72,7 @@ function Icarus:new(args)
     type='control',
     id="attack",
     name="attack",
-  controlspec=controlspec.new(0,10,'lin',0,0.5,'s')}
+  controlspec=controlspec.new(0,10,'lin',0,0.5,'s',0.1/10)}
   params:set_action("attack",function(v)
     engine.attack(v)
   end)
@@ -80,7 +80,7 @@ function Icarus:new(args)
     type='control',
     id="decay",
     name="decay",
-  controlspec=controlspec.new(0,10,'lin',0,1,'s')}
+  controlspec=controlspec.new(0,10,'lin',0,1,'s',0.1/10)}
   params:set_action("decay",function(v)
     engine.decay(v)
   end)
@@ -88,7 +88,7 @@ function Icarus:new(args)
     type='control',
     id="sustain",
     name="sustain",
-  controlspec=controlspec.new(0,2,'lin',0,0.9,'amp')}
+  controlspec=controlspec.new(0,2,'lin',0,0.9,'amp',0.01/2)}
   params:set_action("sustain",function(v)
     engine.sustain(v)
   end)
@@ -96,7 +96,7 @@ function Icarus:new(args)
     type='control',
     id="release",
     name="release",
-  controlspec=controlspec.new(0,10,'lin',0,5,'s')}
+  controlspec=controlspec.new(0,10,'lin',0,5,'s',0.1/10)}
   params:set_action("release",function(v)
     engine.release(v)
   end)
@@ -122,7 +122,7 @@ function Icarus:new(args)
     type='control',
     id="feedback",
     name="feedback",
-  controlspec=controlspec.new(0.5,1.5,'lin',0,1.3,'',0.01/1)}
+  controlspec=controlspec.new(0.5,1.5,'lin',0,0.93,'',0.01/1)}
   params:set_action("feedback",function(v)
     engine.feedback(v)
   end)
@@ -160,7 +160,7 @@ function Icarus:new(args)
     type='control',
     id="detuning",
     name="detuning",
-  controlspec=controlspec.new(0,100,'lin',0,10,'cents',1/100)}
+  controlspec=controlspec.new(0,100,'lin',0,10,'cents',0.1/100)}
   params:set_action("detuning",function(v)
     engine.detuning(v/100)
   end)

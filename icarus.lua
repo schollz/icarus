@@ -1,4 +1,4 @@
--- icarus v1.1.0
+-- icarus v1.2.0
 --
 -- I warn you, fly a middle
 -- course: go too low & water
@@ -97,12 +97,12 @@ end
 function enc(k,d)
   if k==1 then
     params:delta("delaytime",d)
-    -- if params:get("delaytime")<0.25 then
-    --   params:delta("destruction",d)
+    if params:get("delaytime")<0.25 then
+       params:delta("destruction",d)
     --   params:set("pressdisablesfeedback",2)
-    -- else
+    else
     --   params:set("pressdisablesfeedback",1)
-    -- end
+    end
   elseif k==2 then
     params:delta("lpf",-1*sign(d))
   elseif k==3 then

@@ -39,7 +39,7 @@ Engine_Icarus : CroneEngine {
 
 				// dreamcrusher++
 				in = Splay.ar(
-				(pulse*
+				( // (pulse*
 				Pulse.ar(Lag.kr(hz+(
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz).cpsmidi+1).midicps-(hz))*detuning
@@ -48,20 +48,20 @@ Engine_Icarus : CroneEngine {
 					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
 					mul:0.5
 				))
-				+
-				(saw*
-				VarSaw.ar(Lag.kr(hz+(
-					SinOsc.kr(LFNoise0.kr(1))*
-					(((hz).cpsmidi+1).midicps-(hz))*detuning
-					),portamento),
-					width:
-					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
-					mul:0.5
-				))
+				//+
+				// (saw*
+				// VarSaw.ar(Lag.kr(hz+(
+				// 	SinOsc.kr(LFNoise0.kr(1))*
+				// 	(((hz).cpsmidi+1).midicps-(hz))*detuning
+				// 	),portamento),
+				// 	width:
+				// 	LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
+				// 	mul:0.5
+				// ))
 				);
 				// add suboscillator
 				in = in + (sublevel*Splay.ar(
-				(pulse*
+				( // (pulse*
 				Pulse.ar(Lag.kr(hz/2+(
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz/2).cpsmidi+1).midicps-(hz/2))*detuning
@@ -70,16 +70,16 @@ Engine_Icarus : CroneEngine {
 					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
 					mul:0.5
 				))
-				+
-				(saw*
-				VarSaw.ar(Lag.kr(hz/2+(
-					SinOsc.kr(LFNoise0.kr(1))*
-					(((hz/2).cpsmidi+1).midicps-(hz/2))*detuning
-					),portamento),
-					width:
-					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
-					mul:0.5
-				))
+				// +
+				// (saw*
+				// VarSaw.ar(Lag.kr(hz/2+(
+				// 	SinOsc.kr(LFNoise0.kr(1))*
+				// 	(((hz/2).cpsmidi+1).midicps-(hz/2))*detuning
+				// 	),portamento),
+				// 	width:
+				// 	LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
+				// 	mul:0.5
+				// ))
 				));
 
 				// random panning
@@ -112,8 +112,6 @@ Engine_Icarus : CroneEngine {
 				))))+local)/2;
 				// add tremelo
                 // local = local * ((tremelo>0)*SinOsc.kr(tremelo,0,0.4)+(tremelo<0.0001));
-
-
 
 			    LocalOut.ar(local*Lag.kr(feedback,1));
 				
