@@ -25,22 +25,38 @@ function Icarus:new(args)
 
   local debounce_delaytime=0
 
-  params:add_group("ICARUS",18)
+  params:add_group("ICARUS",19)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
   params:add_option("polyphony","polyphony",{"monophonic","polyphonic"},2)
   params:add {
     type='control',
     id="amp",
     name="amp",
-  controlspec=controlspec.new(0,10,'lin',0,1.0,'amp')}
+  controlspec=controlspec.new(0,2,'lin',0,1.0,'amp',0.01/2)}
   params:set_action("amp",function(v)
     engine.amp(v)
   end)
+  -- params:add {
+  --   type='control',
+  --   id="pulse",
+  --   name="pulse",
+  -- controlspec=controlspec.new(0,2,'lin',0,1.0,'amp',0.01/2)}
+  -- params:set_action("pulse",function(v)
+  --   engine.pulse(v)
+  -- end)
+  -- params:add {
+  --   type='control',
+  --   id="saw",
+  --   name="saw",
+  -- controlspec=controlspec.new(0,2,'lin',0,0.0,'amp',0.01/2)}
+  -- params:set_action("saw",function(v)
+  --   engine.saw(v)
+  -- end)
   params:add {
     type='control',
     id="sub",
     name="sub",
-  controlspec=controlspec.new(0,10,'lin',0,0.5,'amp')}
+  controlspec=controlspec.new(0,2,'lin',0,0.5,'amp',0.01/2)}
   params:set_action("sub",function(v)
     engine.sub(v)
   end)
@@ -56,7 +72,7 @@ function Icarus:new(args)
     type='control',
     id="attack",
     name="attack",
-  controlspec=controlspec.new(0,10,'lin',0,0.5,'s')}
+  controlspec=controlspec.new(0,10,'lin',0,0.5,'s',0.1/10)}
   params:set_action("attack",function(v)
     engine.attack(v)
   end)
@@ -64,7 +80,7 @@ function Icarus:new(args)
     type='control',
     id="decay",
     name="decay",
-  controlspec=controlspec.new(0,10,'lin',0,1,'s')}
+  controlspec=controlspec.new(0,10,'lin',0,1,'s',0.1/10)}
   params:set_action("decay",function(v)
     engine.decay(v)
   end)
@@ -72,7 +88,7 @@ function Icarus:new(args)
     type='control',
     id="sustain",
     name="sustain",
-  controlspec=controlspec.new(0,2,'lin',0,0.9,'amp')}
+  controlspec=controlspec.new(0,2,'lin',0,0.9,'amp',0.01/2)}
   params:set_action("sustain",function(v)
     engine.sustain(v)
   end)
@@ -80,7 +96,7 @@ function Icarus:new(args)
     type='control',
     id="release",
     name="release",
-  controlspec=controlspec.new(0,10,'lin',0,5,'s')}
+  controlspec=controlspec.new(0,10,'lin',0,5,'s',0.1/10)}
   params:set_action("release",function(v)
     engine.release(v)
   end)
@@ -98,8 +114,7 @@ function Icarus:new(args)
     type='control',
     id='resonance',
     name='resonance',
-    controlspec=controlspec.new(0,0.95,'lin',0,0,'',0.01/0.95)
-  }
+  controlspec=controlspec.new(0,0.95,'lin',0,0,'',0.01/0.95)}
   params:set_action("resonance",function(v)
     engine.resonance(v)
   end)
@@ -112,13 +127,25 @@ function Icarus:new(args)
     engine.feedback(v)
   end)
   params:add_option("pressdisablesfeedback","press disables feedback",{"no","yes"},1)
+  local time_set_delaytime=clock.get_beat_sec()*clock.get_beats()
   params:add {
     type='control',
     id="delaytime",
     name="delay time",
-  controlspec=controlspec.new(15,30,'lin',0,25,'x100 s',0.01/15)}
+  controlspec=controlspec.new(0.05,0.5,'lin',0,0.25,'s')}
   params:set_action("delaytime",function(v)
-    engine.delaytime(v/100)
+    -- local current_time=clock.get_beat_sec()*clock.get_beats()
+    -- local last_time_diff=current_time-time_set_delaytime
+    -- print(last_time_diff)
+    -- if last_time_diff > 0.5 then
+    --   last_time_diff = 0.5
+    -- elseif last_time_diff < 0.0005 then
+    --   last_time_diff=0.0005
+    -- end
+    -- print(last_time_diff)
+    -- engine.delaytimelag(last_time_diff)
+    -- time_set_delaytime=current_time
+    engine.delaytime(v)
     -- debounce_delaytime=v
   end)
   params:add {
@@ -128,6 +155,14 @@ function Icarus:new(args)
   controlspec=controlspec.new(0,3,'lin',0,0.1,'s',0.1/3)}
   params:set_action("portamento",function(v)
     engine.portamento(v)
+  end)
+  params:add {
+    type='control',
+    id="detuning",
+    name="detuning",
+  controlspec=controlspec.new(0,100,'lin',0,10,'cents',0.1/100)}
+  params:set_action("detuning",function(v)
+    engine.detuning(v/100)
   end)
   -- params:add {
   --   type='control',
