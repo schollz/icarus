@@ -14,8 +14,6 @@
 -- K1,2,3 bounce
 -- speeding up time more easily
 -- destroys the sun
-include('lib/p8')
-
 engine.name="Icarus"
 icarus=include("icarus/lib/icarus")
 local MusicUtil=require "musicutil"
@@ -27,6 +25,7 @@ local time_change=0
 local time_button=false
 local filter_change=0
 local filter_button=false
+local current_time=0
 
 function init()
   skeys=icarus:new()
@@ -148,7 +147,8 @@ function redraw_clock() -- our grid redraw clock
       vol_current=vol_current+sign(vol_target-vol_current)/200
     end
     -- print(vol_current,vol_target)
-    clock.sleep(1/30) -- refresh
+    clock.sleep(1/14) -- refresh
+    current_time=current_time+1/14
     redraw()
   end
 end
@@ -161,7 +161,7 @@ function redraw()
   local rdelay=util.linlin(delay_range[1],delay_range[2],270,90,params:get("delaytime"))
   local center={64,32}
   local rpos={center[1]+40*math.sin(math.rad(rdelay)),center[2]+40*math.cos(math.rad(rdelay))}
-  local rfeedback=util.linlin(0.9,1.5,0,16,params:get("feedback"))
+  local rfeedback=util.linlin(0.9,1.5,4,20,params:get("feedback"))
   local rvolume=util.linlin(0,1,0,144,vol_current)
   local rlow=rfeedback
   local rhigh=rfeedback+rvolume
@@ -175,8 +175,9 @@ function redraw()
   screen.level(15)
   screen.circle(rpos[1],rpos[2]+10,rfeedback)
   screen.fill()
+  screen.update()
   -- the ocean
-  local rfilter=util.linlin(0,18000,35,50,params:get("lpf"))
+  local rfilter=util.linlin(0,18000,25,62,params:get("lpf"))
   -- screen.level(0)
   -- screen.rect(0,rfilter,129,65)
   -- screen.fill()
@@ -195,24 +196,49 @@ function redraw()
   local horizon=math.floor(rfilter)
   --cls()
   -- circfill(30,22,15,7)
-  flip()
-  srand()
-  rectfill(0,horizon,127,127,0)
+  screen.update()
+  math.randomseed(4)
+  screen.level(0)
+  screen.rect(0,rfilter,129,65)
+  screen.fill()
   for y=0,64 do
-    z=64/(y+1)
+    local z=64/(y+1)
     for i=0,z*5 do
-      x=(rnd(160)+t()*150/z)%160-16
-      w=cos(rnd()+t())*12/z
+      x=(rnd(160)+current_time*160/z)%150-16
+      w=cos(rnd()+current_time)*12/z
       if (w>0) then
-        local pgot=pget(math.floor(x),math.floor(horizon-1-y/2))
-        if pgot ~= nil then
-          line(math.floor(x-w),math.floor(y+horizon),math.floor(x+w),math.floor(y+horizon),math.floor(max(1,pgot)))
+        local s = screen.peek(math.floor(x),math.floor(horizon-1-y/2), math.floor(x+1),math.floor(horizon-y/2))
+        if s ~= nil then
+          local pgot = util.clamp(string.byte(s,1),1,15)
+          screen.level(pgot+1)
+          screen.move(x-w,y+horizon)
+          screen.line(x+w,y+horizon)
+          screen.stroke()
         end
       end
     end
   end
 
   screen.update()
+end
+
+--- Cos of value
+-- Value is expected to be between 0..1 (instead of 0..360)
+-- @param x value
+function cos(x)
+  return math.cos(math.rad(x * 360))
+end
+
+function rnd(x)
+  if x == 0 then
+    return 0
+  end
+  if (not x) then
+    x = 1
+  end
+  x = x * 100
+  x = math.random(x) / 100
+  return x
 end
 
 function rerun()

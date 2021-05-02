@@ -288,8 +288,8 @@ function rnd(x)
   if (not x) then
     x = 1
   end
-  x = x * 100000
-  x = math.random(x) / 100000
+  x = x * 100
+  x = math.random(x) / 100
   return x
 end
 
@@ -610,7 +610,6 @@ local function line_w_start(x0, y0, x1, y1, col)
   if is_color_transparent() then
     return
   end
-
   screen.move(x0, y0)
   screen.line(x1, y1)
   screen.stroke()
