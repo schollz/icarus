@@ -14,6 +14,7 @@
 -- K1,2,3 bounce
 -- speeding up time more easily
 -- destroys the sun
+include('lib/p8')
 
 engine.name="Icarus"
 icarus=include("icarus/lib/icarus")
@@ -175,22 +176,42 @@ function redraw()
   screen.circle(rpos[1],rpos[2]+10,rfeedback)
   screen.fill()
   -- the ocean
-  local rfilter=util.linlin(0,18000,32,64,params:get("lpf"))
-  screen.level(0)
-  screen.rect(0,rfilter,129,65)
-  screen.fill()
-  -- draw reflection of the sun in the water
-  screen.level(1)
-  screen.move(0,rfilter)
-  screen.line(129,rfilter)
-  screen.stroke()
-  screen.level(10)
-  for i=1,10 do
-    screen.level(11-i)
-    screen.move(rpos[1]-rfeedback/i*0.8,rfilter+i*2)
-    screen.line(rpos[1]+rfeedback/i*0.8,rfilter+i*2)
-    screen.stroke()
+  local rfilter=util.linlin(0,18000,35,50,params:get("lpf"))
+  -- screen.level(0)
+  -- screen.rect(0,rfilter,129,65)
+  -- screen.fill()
+  -- -- draw reflection of the sun in the water
+  -- screen.level(1)
+  -- screen.move(0,rfilter)
+  -- screen.line(129,rfilter)
+  -- screen.stroke()
+  -- screen.level(10)
+  -- for i=1,10 do
+  --   screen.level(11-i)
+  --   screen.move(rpos[1]-rfeedback/i*0.8,rfilter+i*2)
+  --   screen.line(rpos[1]+rfeedback/i*0.8,rfilter+i*2)
+  --   screen.stroke()
+  -- end
+  local horizon=math.floor(rfilter)
+  --cls()
+  -- circfill(30,22,15,7)
+  flip()
+  srand()
+  rectfill(0,horizon,127,127,0)
+  for y=0,64 do
+    z=64/(y+1)
+    for i=0,z*5 do
+      x=(rnd(160)+t()*150/z)%160-16
+      w=cos(rnd()+t())*12/z
+      if (w>0) then
+        local pgot=pget(math.floor(x),math.floor(horizon-1-y/2))
+        if pgot ~= nil then
+          line(math.floor(x-w),math.floor(y+horizon),math.floor(x+w),math.floor(y+horizon),math.floor(max(1,pgot)))
+        end
+      end
+    end
   end
+
   screen.update()
 end
 
