@@ -38,49 +38,24 @@ Engine_Icarus : CroneEngine {
 				);
 
 				// dreamcrusher++
-				in = Splay.ar(
-				( // (pulse*
-				Pulse.ar(Lag.kr(hz+(
+				in = VarSaw.ar(Lag.kr(hz+(
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz).cpsmidi+1).midicps-(hz))*detuning
 					),portamento),
 					width:
 					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
 					mul:0.5
-				))
-				//+
-				// (saw*
-				// VarSaw.ar(Lag.kr(hz+(
-				// 	SinOsc.kr(LFNoise0.kr(1))*
-				// 	(((hz).cpsmidi+1).midicps-(hz))*detuning
-				// 	),portamento),
-				// 	width:
-				// 	LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
-				// 	mul:0.5
-				// ))
 				);
 				// add suboscillator
-				in = in + (sublevel*Splay.ar(
-				( // (pulse*
-				Pulse.ar(Lag.kr(hz/2+(
+				in = in + Pulse.ar(Lag.kr(hz/2+(
 					SinOsc.kr(LFNoise0.kr(1))*
 					(((hz/2).cpsmidi+1).midicps-(hz/2))*detuning
 					),portamento),
 					width:
 					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
-					mul:0.5
-				))
-				// +
-				// (saw*
-				// VarSaw.ar(Lag.kr(hz/2+(
-				// 	SinOsc.kr(LFNoise0.kr(1))*
-				// 	(((hz/2).cpsmidi+1).midicps-(hz/2))*detuning
-				// 	),portamento),
-				// 	width:
-				// 	LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
-				// 	mul:0.5
-				// ))
-				));
+					mul:0.5*sublevel	
+				);
+				in = Splay.ar(in);
 
 				// random panning
 				in = Balance2.ar(in[0] ,in[1],SinOsc.kr(

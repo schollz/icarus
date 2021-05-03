@@ -1,4 +1,4 @@
--- icarus v1.2.0
+-- icarus v1.3.0
 --
 -- I warn you, fly a middle
 -- course: go too low & water
@@ -14,7 +14,6 @@
 -- K1,2,3 bounce
 -- speeding up time more easily
 -- destroys the sun
-
 engine.name="Icarus"
 icarus=include("icarus/lib/icarus")
 local MusicUtil=require "musicutil"
@@ -26,6 +25,7 @@ local time_change=0
 local time_button=false
 local filter_change=0
 local filter_button=false
+local current_time=0
 
 function init()
   skeys=icarus:new()
@@ -147,7 +147,8 @@ function redraw_clock() -- our grid redraw clock
       vol_current=vol_current+sign(vol_target-vol_current)/200
     end
     -- print(vol_current,vol_target)
-    clock.sleep(1/30) -- refresh
+    clock.sleep(1/14) -- refresh
+    current_time=current_time+1/14
     redraw()
   end
 end
@@ -160,38 +161,84 @@ function redraw()
   local rdelay=util.linlin(delay_range[1],delay_range[2],270,90,params:get("delaytime"))
   local center={64,32}
   local rpos={center[1]+40*math.sin(math.rad(rdelay)),center[2]+40*math.cos(math.rad(rdelay))}
-  local rfeedback=util.linlin(0.9,1.5,0,16,params:get("feedback"))
-  local rvolume=util.linlin(0,1,0,144,vol_current)
+  local rfeedback=util.linlin(0.9,1.5,4,20,params:get("feedback"))
+  local rvolume=util.linlin(0,1,0,32,vol_current)
   local rlow=rfeedback
   local rhigh=rfeedback+rvolume
   for i=rhigh,rlow,-1 do
     local ll=math.floor(util.linlin(rlow,rhigh,14,1,i))
     screen.level(ll)
-    i=i*math.pow(2.1,1/ll)
+    i=i*math.pow(1.5,1/ll)
     screen.circle(rpos[1],rpos[2]+10,i)
     screen.fill()
   end
   screen.level(15)
   screen.circle(rpos[1],rpos[2]+10,rfeedback)
   screen.fill()
+  screen.update()
   -- the ocean
-  local rfilter=util.linlin(0,18000,32,64,params:get("lpf"))
+  local rfilter=util.linlin(0,18000,20,62,params:get("lpf"))
+  -- screen.level(0)
+  -- screen.rect(0,rfilter,129,65)
+  -- screen.fill()
+  -- -- draw reflection of the sun in the water
+  -- screen.level(1)
+  -- screen.move(0,rfilter)
+  -- screen.line(129,rfilter)
+  -- screen.stroke()
+  -- screen.level(10)
+  -- for i=1,10 do
+  --   screen.level(11-i)
+  --   screen.move(rpos[1]-rfeedback/i*0.8,rfilter+i*2)
+  --   screen.line(rpos[1]+rfeedback/i*0.8,rfilter+i*2)
+  --   screen.stroke()
+  -- end
+  local horizon=math.floor(rfilter)
+  --cls()
+  -- circfill(30,22,15,7)
+  screen.update()
+  math.randomseed(4)
   screen.level(0)
   screen.rect(0,rfilter,129,65)
   screen.fill()
-  -- draw reflection of the sun in the water
-  screen.level(1)
-  screen.move(0,rfilter)
-  screen.line(129,rfilter)
-  screen.stroke()
-  screen.level(10)
-  for i=1,10 do
-    screen.level(11-i)
-    screen.move(rpos[1]-rfeedback/i*0.8,rfilter+i*2)
-    screen.line(rpos[1]+rfeedback/i*0.8,rfilter+i*2)
-    screen.stroke()
+  for y=0,64 do
+    local z=64/(y+1)
+    for i=0,z*5 do
+      x=(rnd(160)+current_time*160/z)%150-16
+      w=cos(rnd()+current_time)*12/z
+      if (w>0) then
+        local s = screen.peek(math.floor(x),math.floor(horizon-1-y/2), math.floor(x+1),math.floor(horizon-y/2))
+        if s ~= nil then
+          local pgot = util.clamp(string.byte(s,1),1,15)
+          screen.level(pgot+1)
+          screen.move(x-w,y+horizon)
+          screen.line(x+w,y+horizon)
+          screen.stroke()
+        end
+      end
+    end
   end
+
   screen.update()
+end
+
+--- Cos of value
+-- Value is expected to be between 0..1 (instead of 0..360)
+-- @param x value
+function cos(x)
+  return math.cos(math.rad(x * 360))
+end
+
+function rnd(x)
+  if x == 0 then
+    return 0
+  end
+  if (not x) then
+    x = 1
+  end
+  x = x * 100
+  x = math.random(x) / 100
+  return x
 end
 
 function rerun()
