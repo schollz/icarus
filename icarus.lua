@@ -1,4 +1,4 @@
--- icarus v1.2.0
+-- icarus v1.3.0
 --
 -- I warn you, fly a middle
 -- course: go too low & water
@@ -162,13 +162,13 @@ function redraw()
   local center={64,32}
   local rpos={center[1]+40*math.sin(math.rad(rdelay)),center[2]+40*math.cos(math.rad(rdelay))}
   local rfeedback=util.linlin(0.9,1.5,4,20,params:get("feedback"))
-  local rvolume=util.linlin(0,1,0,144,vol_current)
+  local rvolume=util.linlin(0,1,0,32,vol_current)
   local rlow=rfeedback
   local rhigh=rfeedback+rvolume
   for i=rhigh,rlow,-1 do
     local ll=math.floor(util.linlin(rlow,rhigh,14,1,i))
     screen.level(ll)
-    i=i*math.pow(2.1,1/ll)
+    i=i*math.pow(1.5,1/ll)
     screen.circle(rpos[1],rpos[2]+10,i)
     screen.fill()
   end
@@ -177,7 +177,7 @@ function redraw()
   screen.fill()
   screen.update()
   -- the ocean
-  local rfilter=util.linlin(0,18000,25,62,params:get("lpf"))
+  local rfilter=util.linlin(0,18000,20,62,params:get("lpf"))
   -- screen.level(0)
   -- screen.rect(0,rfilter,129,65)
   -- screen.fill()
