@@ -90,7 +90,7 @@ function setup_midi()
     mididevice[mididevice_list[v]].active=true
   end)
   params:add{type="option",id="midichannel",name="midi ch",options=midi_channels,default=1}
-  params:add_number("bend_range", "bend range", 1, 48, 2)
+  params:add_number("bend_range", "bend range", 0, 48, 2)
 
   if #mididevice_list>1 then
     params:set("midi",2)
