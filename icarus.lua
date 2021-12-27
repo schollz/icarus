@@ -70,6 +70,9 @@ function setup_midi()
           skeys:on(d.note)
         elseif d.type=="note_off" then
           skeys:off(d.note)
+        elseif d.type=="pitchbend" then
+          local bend_st = (util.round(d.val / 2)) / 8192 * 2 -1 -- Convert to -1 to 1
+          engine.bend(bend_st * params:get("bend_range"))
         end
       end
     end
@@ -87,6 +90,7 @@ function setup_midi()
     mididevice[mididevice_list[v]].active=true
   end)
   params:add{type="option",id="midichannel",name="midi ch",options=midi_channels,default=1}
+  params:add_number("bend_range", "bend range", 0, 48, 2)
 
   if #mididevice_list>1 then
     params:set("midi",2)
