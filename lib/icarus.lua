@@ -25,7 +25,7 @@ function Icarus:new(args)
 
   local debounce_delaytime=0
 
-  params:add_group("ICARUS",19)
+  params:add_group("ICARUS",20)
   local filter_freq=controlspec.new(40,18000,'exp',0,18000,'Hz')
   params:add_option("polyphony","polyphony",{"monophonic","polyphonic"},2)
   params:add {
@@ -59,6 +59,14 @@ function Icarus:new(args)
   controlspec=controlspec.new(0,2,'lin',0,0.5,'amp',0.01/2)}
   params:set_action("sub",function(v)
     engine.sub(v)
+  end)
+  params:add {
+    type='control',
+    id="subpitch",
+    name="sub pitch",
+  controlspec=controlspec.new(0,3,'lin',0.01,1,'oct',-0.003333)}
+  params:set_action("subpitch",function(v)
+    engine.subpitch(v)
   end)
   params:add {
     type='control',
