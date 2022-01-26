@@ -17,14 +17,14 @@ Engine_Icarus : CroneEngine {
 		(0..5).do({arg i; 
 			SynthDef("icarussynth"++i,{ 
 				arg amp=0.5, hz=220, pan=0, envgate=0,
-				pulse=0,saw=0,bend=0,
+				pulse=0,saw=0,bend=0,subpitch=1,
 				attack=0.015,decay=1,release=2,sustain=0.9,
 				lpf=20000,resonance=0,portamento=0.1,tremelo=0,destruction=0,
 				pwmcenter=0.5,pwmwidth=0.05,pwmfreq=10,detuning=0.1,
 				feedback=0.5,delaytime=0.25, delaytimelag=0.1, sublevel=0;
 
 				// vars
-				var ender,snd,local,in,ampcheck,hz_dream,hz_sub;
+				var ender,snd,local,in,ampcheck,hz_dream,hz_sub,subdiv;
 
 				// envelope stuff
 				ender = EnvGen.ar(
@@ -45,7 +45,8 @@ Engine_Icarus : CroneEngine {
 					mul:0.5
 				);
 				// add suboscillator
-				hz_sub=(Lag.kr(hz/2+(SinOsc.kr(LFNoise0.kr(1))*(((hz/2).cpsmidi+1).midicps-(hz/2))*detuning),portamento).cpsmidi + bend).midicps;
+				subdiv=2**subpitch;
+				hz_sub=(Lag.kr(hz/subdiv+(SinOsc.kr(LFNoise0.kr(1))*(((hz/subdiv).cpsmidi+1).midicps-(hz/subdiv))*detuning),portamento).cpsmidi + bend).midicps;
 				in = in + Pulse.ar(hz_sub,
 					width:
 					LFTri.kr(pwmfreq+rrand(0.1,0.3),mul:pwmwidth/2,add:pwmcenter),
@@ -253,6 +254,11 @@ Engine_Icarus : CroneEngine {
 		this.addCommand("bend","f", { arg msg;
 			(0..5).do({arg i;
 				icarusPlayer[i].set(\bend,msg[1]);
+			});
+		});
+		this.addCommand("subpitch","f", { arg msg;
+			(0..5).do({arg i;
+				icarusPlayer[i].set(\subpitch,msg[1]);
 			});
 		});
 
