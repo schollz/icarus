@@ -36,7 +36,23 @@ function init()
   clock.run(redraw_clock)
 end
 
+function keyboard.midi_setup()
+  -- setup keyboard code
+  os.execute("aconnect -x; aconnect 128:0 14:0; aconnect 14:0 128:0")
+  keyboard.midi=midi.connect(1) -- virtual port
+end
+
+function keyboard.code(code,value)
+  if value==1 then
+    keyboard.midi:note_on(string.byte(code),math.random(60,90))
+  elseif value==0 then 
+    keyboard.midi:note_off(string.byte(code))
+  end
+end
+
 function setup_midi()
+  keyboard.midi_setup()
+  
   -- get list of devices
   local mididevice={}
   local mididevice_list={"none"}
