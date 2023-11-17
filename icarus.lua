@@ -211,14 +211,24 @@ function redraw()
       x=(rnd(160)+current_time*160/z)%150-16
       w=cos(rnd()+current_time)*12/z
       if (w>0) then
-        local s = screen.peek(math.floor(x),math.floor(horizon-1-y/2), math.floor(x+1),math.floor(horizon-y/2))
+	      local x1 = math.floor(x)
+	      local y1 = math.floor(horizon-1-y/2)
+	      local x2 = math.floor(x+1)
+	      local y2 = math.floor(horizon-y/2)
+	if (x1>0 and x2>0 and x1<128 and x2<128) then
+        local s = screen.peek(x1,y1,x2,y2)
         if s ~= nil then
-          local pgot = util.clamp(string.byte(s,1),1,15)
+	  local ss = string.byte(s,1)
+	   if ss == nil then 
+		  ss = 1
+	  end
+          local pgot = util.clamp(ss,1,15)
           screen.level(pgot+1)
           screen.move(x-w,y+horizon)
           screen.line(x+w,y+horizon)
           screen.stroke()
         end
+end
       end
     end
   end
