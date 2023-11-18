@@ -1,4 +1,4 @@
--- icarus v1.3.0
+-- icarus v1.3.1
 --
 -- I warn you, fly a middle
 -- course: go too low & water
@@ -151,8 +151,8 @@ function redraw_clock() -- our grid redraw clock
       vol_current=vol_current+sign(vol_target-vol_current)/200
     end
     -- print(vol_current,vol_target)
-    clock.sleep(1/14) -- refresh
-    current_time=current_time+1/14
+    clock.sleep(1/20) -- refresh
+    current_time=current_time+1/20
     redraw()
   end
 end
@@ -179,7 +179,7 @@ function redraw()
   screen.level(15)
   screen.circle(rpos[1],rpos[2]+10,rfeedback)
   screen.fill()
-  screen.update()
+  --screen.update()
   -- the ocean
   local rfilter=util.linlin(0,18000,20,62,params:get("lpf"))
   -- screen.level(0)
@@ -200,7 +200,6 @@ function redraw()
   local horizon=math.floor(rfilter)
   --cls()
   -- circfill(30,22,15,7)
-  screen.update()
   math.randomseed(4)
   screen.level(0)
   screen.rect(0,rfilter,129,65)
@@ -211,8 +210,8 @@ function redraw()
       x=(rnd(160)+current_time*160/z)%150-16
       w=cos(rnd()+current_time)*12/z
       if (w>0) then
-        local s = screen.peek(math.floor(x),math.floor(horizon-1-y/2), math.floor(x+1),math.floor(horizon-y/2))
-        if s ~= nil then
+        local s = screen.peek(math.floor(x)%128+1,math.floor(horizon-1-y/2)%64+1, math.floor(x+1)%128+1,math.floor(horizon-y/2)%64+1)
+        if s ~= nil and s~='' then
           local pgot = util.clamp(string.byte(s,1),1,15)
           screen.level(pgot+1)
           screen.move(x-w,y+horizon)
